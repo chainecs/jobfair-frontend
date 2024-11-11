@@ -1,7 +1,9 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState } from "react";
+import CompanyCard from "./CompanyCard";
+import CompanyFormModal from "./CompanyFormModal";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { ICompany } from "@/@types/ICompany";
 
 const companyData: ICompany[] = [
@@ -33,30 +35,102 @@ const companyData: ICompany[] = [
   },
 ];
 
-// CompanyList Component
 const CompanyList: React.FC = () => {
+  const [companies, setCompanies] = useState<ICompany[]>(companyData);
+  const [selectedCompany, setSelectedCompany] = useState<ICompany | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [companyToDelete, setCompanyToDelete] = useState<ICompany | null>(null);
+  const [formData, setFormData] = useState<ICompany>({
+    name: "",
+    business: "",
+    address: "",
+    province: "",
+    postalcode: "",
+    tel: "",
+    picture: "",
+  });
+
+  const openModal = (company?: ICompany) => {
+    if (company) {
+      setSelectedCompany(company);
+      setFormData(company); // Use the selected company data
+    } else {
+      setSelectedCompany(null);
+      setFormData({
+        name: "",
+        business: "",
+        address: "",
+        province: "",
+        postalcode: "",
+        tel: "",
+        picture: "",
+      }); // Set an empty ICompany object
+    }
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => setIsModalOpen(false);
+
+  const openDeleteModal = (company: ICompany) => {
+    setCompanyToDelete(company);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => setIsDeleteModalOpen(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = () => {
+    if (selectedCompany) {
+      setCompanies(companies.map((c) => (c === selectedCompany ? { ...selectedCompany, ...formData } : c)));
+    } else {
+      setCompanies([...companies, { ...formData }]);
+    }
+    closeModal();
+  };
+
+  const handleDelete = () => {
+    if (companyToDelete) {
+      setCompanies(companies.filter((c) => c !== companyToDelete));
+      closeDeleteModal();
+    }
+  };
+
   return (
     <div className='container mx-auto px-6 py-6'>
-      <h2 className='text-2xl font-bold mb-6'>Company List</h2>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {companyData.map((company, index) => (
-          <div key={index} className='bg-white shadow-md rounded-lg p-4'>
-            <Image
-              src={company.picture}
-              alt={company.name}
-              width={150}
-              height={150}
-              className='w-full h-40 object-cover rounded-md mb-4'
-            />
-            <h3 className='text-xl font-semibold'>{company.name}</h3>
-            <p className='text-gray-600'>{company.business}</p>
-            <p className='text-gray-500'>
-              {company.address}, {company.province}, {company.postalcode}
-            </p>
-            {company.tel && <p className='text-gray-500'>Tel: {company.tel}</p>}
-          </div>
+      <h2 className='text-3xl font-bold mb-8 text-center'>Company</h2>
+      <div className='flex justify-center mb-6'>
+        <button
+          onClick={() => openModal()}
+          className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md'>
+          Create New Company
+        </button>
+      </div>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+        {companies.map((company, index) => (
+          <CompanyCard
+            key={index}
+            company={company}
+            onEdit={() => openModal(company)}
+            onDelete={() => openDeleteModal(company)}
+          />
         ))}
       </div>
+
+      {isModalOpen && (
+        <CompanyFormModal
+          formData={formData}
+          onChange={handleChange}
+          onSave={handleSave}
+          onClose={closeModal}
+          isEdit={!!selectedCompany}
+        />
+      )}
+
+      {isDeleteModalOpen && <DeleteConfirmationModal onConfirm={handleDelete} onClose={closeDeleteModal} />}
     </div>
   );
 };
