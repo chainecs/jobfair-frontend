@@ -5,7 +5,6 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-// Register Component
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     name: "",

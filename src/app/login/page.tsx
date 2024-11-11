@@ -2,7 +2,6 @@
 import React from "react";
 import Link from "next/link";
 
-// Login Component
 const Login: React.FC = () => {
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100'>
