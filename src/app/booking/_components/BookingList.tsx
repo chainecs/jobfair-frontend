@@ -11,6 +11,7 @@ import { IBooking } from "@/@types/IBooking";
 const mockBookings: IBooking[] = [
   { bookingDate: new Date("2024-11-15"), company: "Company1", createdAt: new Date("2024-11-01") },
   { bookingDate: new Date("2024-11-20"), company: "Company2", createdAt: new Date("2024-11-02") },
+  { bookingDate: new Date("2024-11-25"), company: "Company3", createdAt: new Date("2024-11-03") },
 ];
 
 const BookingManagement: React.FC = () => {
@@ -69,7 +70,7 @@ const BookingManagement: React.FC = () => {
 
   return (
     <div className='container mx-auto px-6 py-6'>
-      <h2 className='text-3xl font-bold mb-8 text-center'>Booking Management</h2>
+      <h2 className='text-3xl font-bold mb-8 text-center'>Booking</h2>
       <div className='flex justify-center mb-6'>
         <button
           onClick={() => openModal()}
