@@ -2,25 +2,43 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import { userLogOut } from "@/libs/userLogIn";
+import { useRouter } from "next/navigation";
 
 const Navbar: React.FC = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleSignOut = async () => {
+    setIsMenuOpen(false); // ปิดเมนู
+    try {
+      await userLogOut(); // เรียก backend logout API
+      signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
   return (
     <nav className='bg-white border-b'>
       <div className='container mx-auto px-6 py-4 flex justify-between items-center border-b'>
-        {/* Logo Section */}
         <div className='flex items-center'>
           <Link href='/' className='text-2xl font-bold text-blue-600'>
             JobFair
           </Link>
         </div>
 
-        {/* Desktop Menu */}
+        {session?.user && (
+          <div className='text-gray-700 font-medium'>Welcome, {session.user.name || session.user.email}</div>
+        )}
+
         <div className='hidden md:flex items-center space-x-8'>
           <Link href='/booking' className='text-gray-700 hover:text-blue-600 transition-all'>
             Booking
@@ -28,9 +46,15 @@ const Navbar: React.FC = () => {
           <Link href='/company' className='text-gray-700 hover:text-blue-600 transition-all'>
             Company
           </Link>
-          <Link href='/login' className='text-gray-700 hover:text-blue-600 transition-all'>
-            Login
-          </Link>
+          {session ? (
+            <button onClick={handleSignOut} className='text-gray-700 hover:text-blue-600 transition-all'>
+              Logout
+            </button>
+          ) : (
+            <Link href='/login' className='text-gray-700 hover:text-blue-600 transition-all'>
+              Login
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -47,7 +71,6 @@ const Navbar: React.FC = () => {
           </button>
         </div>
       </div>
-
       {/* Mobile Menu */}
       <div
         className={`md:hidden overflow-hidden transition-max-height duration-500 ease-in-out ${
@@ -66,12 +89,18 @@ const Navbar: React.FC = () => {
             onClick={() => setIsMenuOpen(false)}>
             Company
           </Link>
-          <Link
-            href='/login'
-            className='block text-gray-700 hover:text-blue-600 transition py-2'
-            onClick={() => setIsMenuOpen(false)}>
-            Login
-          </Link>
+          {session ? (
+            <button onClick={handleSignOut} className='block text-gray-700 hover:text-blue-600 transition py-2'>
+              Logout
+            </button>
+          ) : (
+            <Link
+              href='/login'
+              className='block text-gray-700 hover:text-blue-600 transition py-2'
+              onClick={() => setIsMenuOpen(false)}>
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>

@@ -1,4 +1,4 @@
-export interface IAuth {
+export interface IRegisterResponse {
   email: string;
   password: string;
   success: boolean;

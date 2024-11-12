@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { IAuth } from "@/@types/IAuth";
+import { IRegisterResponse } from "@/@types/IAuth";
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ const Register: React.FC = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`http://localhost:5001/api/v1/auth/register`, formData);
-      const authData: IAuth = response.data;
+      const authData: IRegisterResponse = response.data;
       if (response.data.success) {
         console.log(authData);
         alert("Registration successful. with email: ");
