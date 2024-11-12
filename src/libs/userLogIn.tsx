@@ -1,5 +1,5 @@
 export async function userLogIn(email: string, password: string) {
-  const response = await fetch("http://localhost:5001/api/v1/auth/login", {
+  const response = await fetch(`${process.env.API_URL}/api/v1/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export async function userLogIn(email: string, password: string) {
 }
 
 export async function userLogOut() {
-  const response = await fetch("http://localhost:5001/api/v1/auth/logout", {
+  const response = await fetch(`${process.env.API_URL}/api/v1/auth/logout`, {
     method: "GET",
   });
 

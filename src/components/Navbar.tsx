@@ -16,9 +16,9 @@ const Navbar: React.FC = () => {
   };
 
   const handleSignOut = async () => {
-    setIsMenuOpen(false); // ปิดเมนู
+    setIsMenuOpen(false);
     try {
-      await userLogOut(); // เรียก backend logout API
+      await userLogOut();
       signOut();
       router.push("/");
     } catch (error) {

@@ -2,9 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import axios from "axios";
 import { useRouter } from "next/navigation";
-import { IRegisterResponse } from "@/@types/IAuth";
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -22,16 +20,25 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     try {
-      const response = await axios.post(`http://localhost:5001/api/v1/auth/register`, formData);
-      const authData: IRegisterResponse = response.data;
-      if (response.data.success) {
-        console.log(authData);
-        alert("Registration successful. with email: ");
-        // router.push("/login");
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Registration successful!");
+        router.push("/login");
+      } else {
+        setError("Registration failed. Please try again.");
       }
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      setError("Server error. Please try again later.");
     }
   };
 
