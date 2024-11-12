@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
         className={`md:hidden overflow-hidden transition-max-height duration-500 ease-in-out ${
           isMenuOpen ? "max-h-60" : "max-h-0"
         } bg-white shadow-md`}>
-        <div className='px-10 pb-2 text-center'>
+        <div className='flex flex-col px-10 pb-2 text-center'>
           <Link
             href='/booking'
             className='block text-gray-700 hover:text-blue-600 transition py-2 border-b'
