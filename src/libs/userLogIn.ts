@@ -1,8 +1,10 @@
-import axiosInstance from "./axiosInstance";
+import api from "./axiosInstance";
 
 export async function userLogIn(email: string, password: string) {
   try {
-    const response = await axiosInstance.post("/api/v1/auth/login", { email, password });
+    const response = await api.post("/api/v1/auth/login", { email, password });
+    console.log("Login successful:", response.data);
+    api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
     return response.data;
   } catch (error) {
     console.error("Login failed:", error);
@@ -12,7 +14,7 @@ export async function userLogIn(email: string, password: string) {
 
 export async function userLogOut() {
   try {
-    const response = await axiosInstance.get("/api/v1/auth/logout");
+    const response = await api.get("/api/v1/auth/logout");
     return response.data;
   } catch (error) {
     console.error("Logout failed:", error);
@@ -22,7 +24,7 @@ export async function userLogOut() {
 
 export async function getMe(token: string) {
   try {
-    const response = await axiosInstance.get("/api/v1/auth/me", {
+    const response = await api.get("/api/v1/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
