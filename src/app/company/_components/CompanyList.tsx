@@ -1,46 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "@/libs/axiosInstance";
 import CompanyCard from "./CompanyCard";
 import CompanyFormModal from "./CompanyFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { ICompany } from "@/@types/ICompany";
 import { useSession } from "next-auth/react";
 
-const companyData: ICompany[] = [
-  {
-    name: "TechCorp Solutions",
-    business: "Software Development",
-    address: "123 Main Street",
-    province: "Bangkok",
-    postalcode: "10110",
-    tel: "02-123-4567",
-    picture: "https://picsum.photos/200/300?random=1",
-  },
-  {
-    name: "GreenField Agriculture",
-    business: "Agricultural Equipment",
-    address: "456 Country Road",
-    province: "Chiang Mai",
-    postalcode: "50000",
-    tel: "053-789-0123",
-    picture: "https://picsum.photos/200/300?random=2",
-  },
-  {
-    name: "HealthFirst Medical",
-    business: "Healthcare Services",
-    address: "789 Health Avenue",
-    province: "Phuket",
-    postalcode: "83000",
-    picture: "https://picsum.photos/200/300?random=3",
-  },
-];
-
 const CompanyList: React.FC = () => {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin"; // Determine if the user is an admin
 
-  const [companies, setCompanies] = useState<ICompany[]>(companyData);
+  const [companies, setCompanies] = useState<ICompany[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<ICompany | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -55,10 +27,26 @@ const CompanyList: React.FC = () => {
     picture: "",
   });
 
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await api.get("/api/v1/companies");
+        if (response.status === 200 && Array.isArray(response.data.data)) {
+          setCompanies(response.data.data);
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch companies:", error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
   const openModal = (company?: ICompany) => {
     if (company) {
       setSelectedCompany(company);
-      setFormData(company); // Use the selected company data
+      setFormData(company);
     } else {
       setSelectedCompany(null);
       setFormData({
@@ -87,19 +75,38 @@ const CompanyList: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    if (selectedCompany) {
-      setCompanies(companies.map((c) => (c === selectedCompany ? { ...selectedCompany, ...formData } : c)));
-    } else {
-      setCompanies([...companies, { ...formData }]);
+  const handleSave = async () => {
+    try {
+      if (selectedCompany) {
+        // Update existing company
+        const response = await api.put(`/api/v1/companies/${selectedCompany._id}`, formData);
+        if (response.status === 200) {
+          setCompanies(companies.map((c) => (c._id === selectedCompany._id ? response.data.data : c)));
+        }
+      } else {
+        // Create new company
+        const response = await api.post("/api/v1/companies", formData);
+        if (response.status === 201) {
+          setCompanies([...companies, response.data.data]);
+        }
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Failed to save company:", error);
     }
-    closeModal();
   };
 
-  const handleDelete = () => {
-    if (companyToDelete) {
-      setCompanies(companies.filter((c) => c !== companyToDelete));
-      closeDeleteModal();
+  const handleDelete = async () => {
+    try {
+      if (companyToDelete) {
+        const response = await api.delete(`/api/v1/companies/${companyToDelete._id}`);
+        if (response.status === 200) {
+          setCompanies(companies.filter((c) => c._id !== companyToDelete._id));
+          closeDeleteModal();
+        }
+      }
+    } catch (error) {
+      console.error("Failed to delete company:", error);
     }
   };
 
@@ -116,9 +123,9 @@ const CompanyList: React.FC = () => {
         )}
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-        {companies.map((company, index) => (
+        {companies.map((company) => (
           <CompanyCard
-            key={index}
+            key={company._id}
             company={company}
             onEdit={() => openModal(company)}
             onDelete={() => openDeleteModal(company)}
