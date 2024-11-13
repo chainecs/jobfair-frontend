@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CompanyCard from "./CompanyCard";
 import CompanyFormModal from "./CompanyFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
@@ -37,6 +37,9 @@ const companyData: ICompany[] = [
 ];
 
 const CompanyList: React.FC = () => {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin"; // Determine if the user is an admin
+
   const [companies, setCompanies] = useState<ICompany[]>(companyData);
   const [selectedCompany, setSelectedCompany] = useState<ICompany | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,14 +55,6 @@ const CompanyList: React.FC = () => {
     picture: "",
   });
 
-  const { data: session, status } = useSession();
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      console.log("Session token:", session?.user);
-    }
-  }, [status, session]);
-
   const openModal = (company?: ICompany) => {
     if (company) {
       setSelectedCompany(company);
@@ -74,7 +69,7 @@ const CompanyList: React.FC = () => {
         postalcode: "",
         tel: "",
         picture: "",
-      }); // Set an empty ICompany object
+      });
     }
     setIsModalOpen(true);
   };
@@ -112,11 +107,13 @@ const CompanyList: React.FC = () => {
     <div className='container mx-auto px-6 py-6'>
       <h2 className='text-3xl font-bold mb-8 text-center'>Company</h2>
       <div className='flex justify-center mb-6'>
-        <button
-          onClick={() => openModal()}
-          className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md'>
-          Create New Company
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => openModal()}
+            className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md'>
+            Create New Company
+          </button>
+        )}
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
         {companies.map((company, index) => (
@@ -125,6 +122,7 @@ const CompanyList: React.FC = () => {
             company={company}
             onEdit={() => openModal(company)}
             onDelete={() => openDeleteModal(company)}
+            isAdmin={isAdmin} // Pass the isAdmin prop
           />
         ))}
       </div>

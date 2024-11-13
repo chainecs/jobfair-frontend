@@ -5,11 +5,12 @@ import { ICompany } from "@/@types/ICompany";
 
 interface CompanyCardProps {
   company: ICompany;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void; // Make onEdit optional
+  onDelete?: () => void; // Make onDelete optional
+  isAdmin: boolean; // Add an isAdmin prop to check user role
 }
 
-const CompanyCard: React.FC<CompanyCardProps> = ({ company, onEdit, onDelete }) => (
+const CompanyCard: React.FC<CompanyCardProps> = ({ company, onEdit, onDelete, isAdmin }) => (
   <div className='bg-white shadow-lg rounded-lg p-6 flex flex-col justify-between h-full'>
     <div className='mb-8'>
       <Image
@@ -26,18 +27,20 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, onEdit, onDelete }) 
       </p>
       {company.tel && <p className='text-gray-500'>Tel: {company.tel}</p>}
     </div>
-    <div className='mt-auto flex justify-between'>
-      <button
-        onClick={onEdit}
-        className='bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all shadow-md'>
-        Edit
-      </button>
-      <button
-        onClick={onDelete}
-        className='bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-all shadow-md'>
-        Delete
-      </button>
-    </div>
+    {isAdmin && ( // Conditionally render buttons if the user is an admin
+      <div className='mt-auto flex justify-between'>
+        <button
+          onClick={onEdit}
+          className='bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all shadow-md'>
+          Edit
+        </button>
+        <button
+          onClick={onDelete}
+          className='bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-all shadow-md'>
+          Delete
+        </button>
+      </div>
+    )}
   </div>
 );
 
