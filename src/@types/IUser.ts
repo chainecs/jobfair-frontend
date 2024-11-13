@@ -1,12 +1,9 @@
 export interface IUser {
+  _id: string;
+  token: string;
   name: string;
   email: string;
-  tel: string;
+  tel?: string;
   role?: "user" | "admin";
-  password: string;
-  //   resetPasswordToken?: string;
-  //   resetPasswordExpire?: Date;
   createdAt?: Date;
-  //   getSignedJwtToken?: () => string;
-  //   matchPassword?: (enteredPassword: string) => Promise<boolean>;
 }

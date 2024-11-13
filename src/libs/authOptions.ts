@@ -12,9 +12,11 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials) return null;
+
         const user = await userLogIn(credentials.username, credentials.password);
-        if (user) {
-          return user;
+
+        if (user && user.role) {
+          return user; // Include role and token in the user object
         }
         return null;
       },
@@ -29,13 +31,21 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user._id;
         token.email = user.email;
+        token.role = user.role;
+        token.token = user.token; // Add token to the JWT payload
       }
       return token;
     },
     async session({ session, token }) {
-      session.user = token;
+      session.user = {
+        ...session.user,
+        id: token.id as string,
+        email: token.email as string,
+        role: token.role as string,
+        token: token.token as string, // Set the token on session.user
+      };
       return session;
     },
   },

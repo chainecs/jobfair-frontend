@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CompanyCard from "./CompanyCard";
 import CompanyFormModal from "./CompanyFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { ICompany } from "@/@types/ICompany";
+import { useSession } from "next-auth/react";
 
 const companyData: ICompany[] = [
   {
@@ -50,6 +51,14 @@ const CompanyList: React.FC = () => {
     tel: "",
     picture: "",
   });
+
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      console.log("Session token:", session?.user);
+    }
+  }, [status, session]);
 
   const openModal = (company?: ICompany) => {
     if (company) {
