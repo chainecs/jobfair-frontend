@@ -8,9 +8,14 @@ export const useRequireAuth = () => {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login");
+      router.replace("/login"); // Use replace to avoid history back to this page
     }
   }, [status, router]);
+
+  // Return null if user is unauthenticated to prevent any content from rendering
+  if (status === "unauthenticated") {
+    return { session: null, status: "unauthenticated" };
+  }
 
   return { session, status };
 };
