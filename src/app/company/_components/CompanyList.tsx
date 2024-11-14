@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import api from "@/libs/axiosInstance";
+import api from "@/libs/api";
 import CompanyCard from "./CompanyCard";
 import CompanyFormModal from "./CompanyFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";

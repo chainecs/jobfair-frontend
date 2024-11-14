@@ -1,10 +1,11 @@
-import api from "./axiosInstance";
+import api from "../libs/api";
 
 export async function userLogIn(email: string, password: string) {
   try {
     const response = await api.post("/api/v1/auth/login", { email, password });
     console.log("Login successful:", response.data);
     api.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
+    console.log(api.defaults.headers.common["Authorization"]);
     return response.data;
   } catch (error) {
     console.error("Login failed:", error);

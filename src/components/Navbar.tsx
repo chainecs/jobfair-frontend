@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { userLogOut } from "@/libs/userLogIn";
+import { userLogOut } from "@/services/auth";
 import { useRouter } from "next/navigation";
 
 const Navbar: React.FC = () => {

@@ -1,41 +1,40 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import api from "@/libs/axiosInstance"; // Axios instance with token interceptor
+import React, { useEffect, useState } from "react";
 import BookingCard from "./BookingCard";
 import BookingFormModal from "./BookingFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { IBooking } from "@/@types/IBooking";
+import { useBookingStore } from "@/store/bookings/useBookingStore";
 
 const BookingManagement: React.FC = () => {
-  const [bookings, setBookings] = useState<IBooking[]>([]);
-  const [selectedBooking, setSelectedBooking] = useState<IBooking | null>(null);
+  const {
+    bookings,
+    selectedBooking,
+    setBookings,
+    setSelectedBooking,
+    listBookings,
+    createBooking,
+    updateBooking,
+    deleteBooking,
+  } = useBookingStore();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [bookingToDelete, setBookingToDelete] = useState<IBooking | null>(null);
   const [formData, setFormData] = useState({ bookingDate: new Date(), company: "" });
 
   // Fetch bookings on component mount
   useEffect(() => {
-    const fetchBookings = async () => {
+    const getBookings = async () => {
       try {
-        const response = await api.get("/api/v1/bookings");
-        console.log("Bookings:", response.data);
-
-        // Ensure we set only the booking data array
-        if (response.status === 200 && Array.isArray(response.data.data)) {
-          setBookings(response.data.data);
-        } else {
-          console.error("Unexpected response format:", response.data);
-          setBookings([]); // Default to an empty array if the response is not as expected
-        }
+        const bookingsData = await listBookings();
+        setBookings(bookingsData);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
-        setBookings([]); // Default to an empty array on error
       }
     };
-    fetchBookings();
-  }, []);
+    getBookings();
+  }, [listBookings, setBookings]);
 
   const openModal = (booking?: IBooking) => {
     if (booking) {
@@ -51,7 +50,7 @@ const BookingManagement: React.FC = () => {
   const closeModal = () => setIsModalOpen(false);
 
   const openDeleteModal = (booking: IBooking) => {
-    setBookingToDelete(booking);
+    setSelectedBooking(booking);
     setIsDeleteModalOpen(true);
   };
 
@@ -71,16 +70,12 @@ const BookingManagement: React.FC = () => {
     try {
       if (selectedBooking) {
         // Update existing booking
-        const response = await api.put(`/api/v1/bookings/${selectedBooking._id}`, formData);
-        if (response.status === 200) {
-          setBookings(bookings.map((b) => (b._id === selectedBooking._id ? response.data : b)));
-        }
+        const updatedBooking = await updateBooking(selectedBooking._id!, formData);
+        setBookings(bookings.map((b) => (b._id === selectedBooking._id ? updatedBooking : b)));
       } else {
         // Create new booking
-        const response = await api.post("/api/v1/bookings", formData);
-        if (response.status === 200) {
-          setBookings([...bookings, response.data]);
-        }
+        const newBooking = await createBooking(formData);
+        setBookings([...bookings, newBooking]);
       }
       closeModal();
     } catch (error) {
@@ -90,12 +85,10 @@ const BookingManagement: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      if (bookingToDelete) {
-        const response = await api.delete(`/api/v1/bookings/${bookingToDelete._id}`);
-        if (response.status === 200) {
-          setBookings(bookings.filter((b) => b._id !== bookingToDelete._id));
-          closeDeleteModal();
-        }
+      if (selectedBooking) {
+        await deleteBooking(selectedBooking._id!);
+        setBookings(bookings.filter((b) => b._id !== selectedBooking._id));
+        closeDeleteModal();
       }
     } catch (error) {
       console.error("Failed to delete booking:", error);
