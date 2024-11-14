@@ -8,9 +8,10 @@ interface CompanyFormModalProps {
   onSave: () => void;
   onClose: () => void;
   isEdit: boolean;
+  errors: Partial<ICompany>; // Add errors prop to display validation errors
 }
 
-const CompanyFormModal: React.FC<CompanyFormModalProps> = ({ formData, onChange, onSave, onClose, isEdit }) => (
+const CompanyFormModal: React.FC<CompanyFormModalProps> = ({ formData, onChange, onSave, onClose, isEdit, errors }) => (
   <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
     <div className='bg-white p-10 rounded-lg shadow-lg w-full max-w-lg'>
       <h3 className='text-2xl font-bold mb-6'>{isEdit ? "Edit Company" : "Create Company"}</h3>
@@ -27,6 +28,9 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({ formData, onChange,
             onChange={onChange}
             className='w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600'
           />
+          {errors[field as keyof ICompany] && (
+            <p className='text-red-500 text-sm mt-1'>{errors[field as keyof ICompany]}</p>
+          )}
         </div>
       ))}
       <div className='flex justify-end'>

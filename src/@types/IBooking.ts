@@ -1,10 +1,4 @@
-// Updated IBooking Interface
-export interface ICompany {
-  _id: string;
-  name: string;
-  address: string;
-  tel: string;
-}
+import { ICompany } from "./ICompany";
 
 export interface IBooking {
   _id?: string;

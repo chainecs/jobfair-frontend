@@ -21,7 +21,7 @@ const BookingManagement: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ bookingDate: new Date(), company: "" });
+  const [formData, setFormData] = useState({ bookingDate: new Date(), company: null });
 
   // Fetch bookings on component mount
   useEffect(() => {

@@ -5,6 +5,6 @@ export interface ICompany {
   address: string;
   province: string;
   postalcode: string;
-  tel?: string;
+  tel: string;
   picture: string;
 }

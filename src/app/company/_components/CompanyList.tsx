@@ -17,7 +17,7 @@ const CompanyList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [companyToDelete, setCompanyToDelete] = useState<ICompany | null>(null);
-  const [formData, setFormData] = useState<ICompany>({
+  const [companyFormData, setCompanyFormData] = useState<ICompany>({
     name: "",
     business: "",
     address: "",
@@ -26,6 +26,7 @@ const CompanyList: React.FC = () => {
     tel: "",
     picture: "",
   });
+  const [errors, setErrors] = useState<Partial<ICompany>>({});
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -46,10 +47,10 @@ const CompanyList: React.FC = () => {
   const openModal = (company?: ICompany) => {
     if (company) {
       setSelectedCompany(company);
-      setFormData(company);
+      setCompanyFormData(company);
     } else {
       setSelectedCompany(null);
-      setFormData({
+      setCompanyFormData({
         name: "",
         business: "",
         address: "",
@@ -59,6 +60,7 @@ const CompanyList: React.FC = () => {
         picture: "",
       });
     }
+    setErrors({});
     setIsModalOpen(true);
   };
 
@@ -72,18 +74,55 @@ const CompanyList: React.FC = () => {
   const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setCompanyFormData({ ...companyFormData, [e.target.name]: e.target.value });
+    if (errors[e.target.name as keyof ICompany]) {
+      setErrors({ ...errors, [e.target.name]: "" }); // Clear the error for this field
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Partial<ICompany> = {};
+
+    // Required fields
+    if (!companyFormData.name.trim()) newErrors.name = "Name is required.";
+    if (!companyFormData.business.trim()) newErrors.business = "Business type is required.";
+    if (!companyFormData.address.trim()) newErrors.address = "Address is required.";
+    if (!companyFormData.province.trim()) newErrors.province = "Province is required.";
+
+    // Postal code: Ensure it's numeric and 5 digits
+    if (!companyFormData.postalcode.trim()) {
+      newErrors.postalcode = "Postal code is required.";
+    } else if (!/^\d{5}$/.test(companyFormData.postalcode.trim())) {
+      newErrors.postalcode = "Postal code must be a 5-digit number.";
+    }
+
+    // Telephone: Ensure it's numeric and follows a basic format (e.g., 10 digits)
+    if (!companyFormData.tel.trim()) {
+      newErrors.tel = "Telephone number is required.";
+    } else if (!/^\d{10}$/.test(companyFormData.tel.trim())) {
+      newErrors.tel = "Telephone number must be a 10-digit number.";
+    }
+
+    // Picture URL (Optional): If provided, validate it’s a proper URL
+    if (companyFormData.picture && !/^https?:\/\/.+\..+$/.test(companyFormData.picture.trim())) {
+      newErrors.picture = "Picture must be a valid URL (e.g., https://picsum.photos/200/300?random=1).";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
   };
 
   const handleSave = async () => {
+    if (!validateForm()) return; // Prevent submission if validation fails
+
     try {
       if (selectedCompany) {
-        const response = await api.put(`/api/v1/companies/${selectedCompany._id}`, formData);
+        const response = await api.put(`/api/v1/companies/${selectedCompany._id}`, companyFormData);
         if (response.status === 200) {
           setCompanies(companies.map((c) => (c._id === selectedCompany._id ? response.data.data : c)));
         }
       } else {
-        const response = await api.post("/api/v1/companies", formData);
+        const response = await api.post("/api/v1/companies", companyFormData);
         if (response.status === 201) {
           setCompanies([...companies, response.data.data]);
         }
@@ -134,11 +173,12 @@ const CompanyList: React.FC = () => {
 
       {isModalOpen && (
         <CompanyFormModal
-          formData={formData}
+          formData={companyFormData}
           onChange={handleChange}
           onSave={handleSave}
           onClose={closeModal}
           isEdit={!!selectedCompany}
+          errors={errors}
         />
       )}
 
