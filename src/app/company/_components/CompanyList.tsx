@@ -78,13 +78,11 @@ const CompanyList: React.FC = () => {
   const handleSave = async () => {
     try {
       if (selectedCompany) {
-        // Update existing company
         const response = await api.put(`/api/v1/companies/${selectedCompany._id}`, formData);
         if (response.status === 200) {
           setCompanies(companies.map((c) => (c._id === selectedCompany._id ? response.data.data : c)));
         }
       } else {
-        // Create new company
         const response = await api.post("/api/v1/companies", formData);
         if (response.status === 201) {
           setCompanies([...companies, response.data.data]);
