@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "../libs/api";
 
 export async function userLogIn(email: string, password: string) {
@@ -8,8 +9,11 @@ export async function userLogIn(email: string, password: string) {
     console.log(api.defaults.headers.common["Authorization"]);
     return response.data;
   } catch (error) {
-    console.error("Login failed:", error);
-    throw new Error("Login failed");
+    console.error("Login error:", error);
+    if ((error as any).response?.data?.message) {
+      throw new Error((error as any).response.data.message);
+    }
+    throw error;
   }
 }
 
