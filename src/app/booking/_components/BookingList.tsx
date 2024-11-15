@@ -9,6 +9,7 @@ import { ICompany } from "@/@types/ICompany";
 import { useBookingStore } from "@/store/bookings/useBookingStore";
 import { fetchCompanies } from "@/services/company";
 import MessageModal from "@/components/MessageModal";
+import { MdAdd } from "react-icons/md";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -147,11 +148,13 @@ const BookingManagement: React.FC = () => {
     <div className='container mx-auto px-6 py-6'>
       <h2 className='text-3xl font-bold mb-8 text-center'>Booking</h2>
       <div className='flex justify-center mb-6'>
-        <button
-          onClick={() => openModal()}
-          className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md'>
-          Create New Booking
-        </button>
+        <div className='flex justify-center mb-6'>
+          <button
+            onClick={() => openModal()}
+            className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center'>
+            <MdAdd className='mr-2 text-lg' /> Create New Booking
+          </button>
+        </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
         {bookings.map((booking, index) => (

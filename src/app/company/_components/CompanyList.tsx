@@ -8,6 +8,7 @@ import { ICompany } from "@/@types/ICompany";
 import { useSession } from "next-auth/react";
 import { useCompanyStore } from "@/store/company/useCompanyStore";
 import MessageModal from "@/components/MessageModal";
+import { MdAdd } from "react-icons/md";
 
 const CompanyList: React.FC = () => {
   const { data: session } = useSession();
@@ -178,8 +179,8 @@ const CompanyList: React.FC = () => {
         {isAdmin && (
           <button
             onClick={() => openModal()}
-            className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md'>
-            Create New Company
+            className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center'>
+            <MdAdd className='mr-2 text-lg' /> Create New Company
           </button>
         )}
       </div>
