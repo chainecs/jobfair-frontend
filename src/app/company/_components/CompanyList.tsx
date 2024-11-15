@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useCompanyStore } from "@/store/company/useCompanyStore";
 import MessageModal from "@/components/MessageModal";
 import { MdAdd } from "react-icons/md";
+import Loading from "@/app/loading";
 
 const CompanyList: React.FC = () => {
   const { data: session } = useSession();
@@ -37,12 +38,14 @@ const CompanyList: React.FC = () => {
     picture: "",
   });
   const [errors, setErrors] = useState<Partial<ICompany>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
         const companiesData = await listCompanies();
         setCompanies(companiesData);
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch companies:", error);
       }
@@ -171,6 +174,10 @@ const CompanyList: React.FC = () => {
       showMessageModal("Failed to delete company.");
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className='container mx-auto px-6 py-6'>

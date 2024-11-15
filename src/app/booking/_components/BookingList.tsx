@@ -10,6 +10,7 @@ import { useBookingStore } from "@/store/bookings/useBookingStore";
 import { fetchCompanies } from "@/services/company";
 import MessageModal from "@/components/MessageModal";
 import { MdAdd } from "react-icons/md";
+import Loading from "@/app/loading";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -32,6 +33,7 @@ const BookingManagement: React.FC = () => {
     isVisible: false,
   });
   const [validationMessage, setValidationMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getBookings = async () => {
@@ -39,6 +41,7 @@ const BookingManagement: React.FC = () => {
         const bookingsData = await listBookings();
         console.log("bookingsData", bookingsData);
         setBookings(bookingsData);
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }
@@ -143,6 +146,10 @@ const BookingManagement: React.FC = () => {
       showMessageModal("Failed to delete booking.");
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className='container mx-auto px-6 py-6'>
