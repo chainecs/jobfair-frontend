@@ -5,6 +5,8 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { userLogOut } from "@/services/auth";
 import { useRouter } from "next/navigation";
+import { FaUserAlt, FaBuilding, FaSignOutAlt, FaSignInAlt } from "react-icons/fa"; // Import ไอคอน
+import { MdMenu } from "react-icons/md";
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -35,24 +37,23 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
 
-        {session?.user && (
-          <div className='text-gray-700 font-medium'>Welcome, {session.user.name || session.user.email}</div>
-        )}
-
+        {/* Desktop Menu */}
         <div className='hidden md:flex items-center space-x-8'>
-          <Link href='/booking' className='text-gray-700 hover:text-blue-600 transition-all'>
-            Booking
+          <Link href='/booking' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
+            <FaUserAlt className='mr-2' /> Booking
           </Link>
-          <Link href='/company' className='text-gray-700 hover:text-blue-600 transition-all'>
-            Company
+          <Link href='/company' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
+            <FaBuilding className='mr-2' /> Company
           </Link>
           {session ? (
-            <button onClick={handleSignOut} className='text-gray-700 hover:text-blue-600 transition-all'>
-              Logout
+            <button
+              onClick={handleSignOut}
+              className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
+              <FaSignOutAlt className='mr-2' /> Logout from {session.user.name || session.user.email}
             </button>
           ) : (
-            <Link href='/login' className='text-gray-700 hover:text-blue-600 transition-all'>
-              Login
+            <Link href='/login' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
+              <FaSignInAlt className='mr-2' /> Login
             </Link>
           )}
         </div>
@@ -60,14 +61,7 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu Button */}
         <div className='md:hidden flex items-center'>
           <button className='text-gray-700 hover:text-blue-600 focus:outline-none' onClick={toggleMenu}>
-            <svg
-              className='h-8 w-8'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-              xmlns='http://www.w3.org/2000/svg'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M4 6h16M4 12h16m-7 6h7' />
-            </svg>
+            <MdMenu className='h-8 w-8' />
           </button>
         </div>
       </div>
@@ -79,26 +73,28 @@ const Navbar: React.FC = () => {
         <div className='flex flex-col px-10 pb-2 text-center'>
           <Link
             href='/booking'
-            className='block text-gray-700 hover:text-blue-600 transition py-2 border-b'
+            className='block text-gray-700 hover:text-blue-600 transition py-2 border-b flex items-center justify-center'
             onClick={() => setIsMenuOpen(false)}>
-            Booking
+            <FaUserAlt className='mr-2' /> Booking
           </Link>
           <Link
             href='/company'
-            className='block text-gray-700 hover:text-blue-600 transition py-2 border-b'
+            className='block text-gray-700 hover:text-blue-600 transition py-2 border-b flex items-center justify-center'
             onClick={() => setIsMenuOpen(false)}>
-            Company
+            <FaBuilding className='mr-2' /> Company
           </Link>
           {session ? (
-            <button onClick={handleSignOut} className='block text-gray-700 hover:text-blue-600 transition py-2'>
-              Logout
+            <button
+              onClick={handleSignOut}
+              className='block text-gray-700 hover:text-blue-600 transition py-2 flex items-center justify-center'>
+              <FaSignOutAlt className='mr-2' /> Logout from {session.user.name || session.user.email}
             </button>
           ) : (
             <Link
               href='/login'
-              className='block text-gray-700 hover:text-blue-600 transition py-2'
+              className='block text-gray-700 hover:text-blue-600 transition py-2 flex items-center justify-center'
               onClick={() => setIsMenuOpen(false)}>
-              Login
+              <FaSignInAlt className='mr-2' /> Login
             </Link>
           )}
         </div>
