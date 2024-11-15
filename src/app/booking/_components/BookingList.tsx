@@ -34,6 +34,8 @@ const BookingManagement: React.FC = () => {
   });
   const [validationMessage, setValidationMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const getBookings = async () => {
@@ -111,6 +113,7 @@ const BookingManagement: React.FC = () => {
       return;
     }
 
+    setIsSaving(true);
     try {
       if (selectedBooking) {
         await updateBooking(selectedBooking._id!, formData);
@@ -130,10 +133,13 @@ const BookingManagement: React.FC = () => {
     } catch (error) {
       console.error("Failed to save booking:", error);
       showMessageModal("Failed to save booking.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
+    setIsDeleting(true);
     try {
       if (selectedBooking) {
         await deleteBooking(selectedBooking._id!);
@@ -144,6 +150,8 @@ const BookingManagement: React.FC = () => {
     } catch (error) {
       console.error("Failed to delete booking:", error);
       showMessageModal("Failed to delete booking.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -184,10 +192,18 @@ const BookingManagement: React.FC = () => {
           isEdit={!!selectedBooking}
           companies={companies}
           validationMessage={validationMessage}
+          isSaving={isSaving}
         />
       )}
 
-      {isDeleteModalOpen && <DeleteConfirmationModal onConfirm={handleDelete} onClose={closeDeleteModal} />}
+      {isDeleteModalOpen && (
+        <DeleteConfirmationModal
+          onConfirm={handleDelete}
+          onClose={closeDeleteModal}
+          isDeleting={isDeleting}
+          booking={selectedBooking}
+        />
+      )}
       {messageModal.isVisible && <MessageModal message={messageModal.message} onClose={closeMessageModal} />}
     </div>
   );
