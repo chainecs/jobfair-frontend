@@ -102,17 +102,18 @@ const BookingManagement: React.FC = () => {
   const handleSave = async () => {
     try {
       if (selectedBooking) {
-        const updatedBooking = await updateBooking(selectedBooking._id!, formData);
+        await updateBooking(selectedBooking._id!, formData);
+        await listBookings();
         showMessageModal("Booking updated successfully.");
       } else if (formData.company?._id) {
         if (bookings.length >= 3) {
           showMessageModal("You can only book up to 3 times.");
           return;
         }
-        const newBooking = await createBooking(formData.company._id, formData);
+        await createBooking(formData.company._id, formData);
+        await listBookings();
         showMessageModal("Booking created successfully.");
       }
-      await listBookings();
       closeModal();
     } catch (error) {
       console.error("Failed to save booking:", error);
