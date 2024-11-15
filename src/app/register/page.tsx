@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import MessageModal from "@/components/MessageModal";
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const Register: React.FC = () => {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false); // เพิ่ม state สำหรับ loading
+  const [modalMessage, setModalMessage] = useState<string | null>(null); // State สำหรับ modal
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,8 +37,7 @@ const Register: React.FC = () => {
       const result = await response.json();
       setIsLoading(false); // หยุด loading
       if (result.success) {
-        alert("Registration successful!");
-        router.push("/login");
+        setModalMessage("Registration successful!"); // แสดงข้อความสำเร็จใน Modal
       } else {
         setError("Registration failed. Please try again.");
       }
@@ -46,8 +47,14 @@ const Register: React.FC = () => {
     }
   };
 
+  const handleModalClose = () => {
+    setModalMessage(null); // ปิด Modal
+    router.push("/login"); // ไปที่หน้า Login
+  };
+
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100'>
+      {modalMessage && <MessageModal message={modalMessage} onClose={handleModalClose} />}
       <div className='bg-white p-8 rounded-lg shadow-md w-full max-w-md px-6'>
         <h2 className='text-2xl font-bold mb-6 text-center'>Register</h2>
         {error && <p className='text-red-500 text-center mb-4'>{error}</p>}
