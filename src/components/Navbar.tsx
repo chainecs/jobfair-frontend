@@ -43,9 +43,11 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Menu */}
         <div className='hidden md:flex items-center space-x-8'>
-          <Link href='/booking' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
-            <FaUserAlt className='mr-2' /> Booking
-          </Link>
+          {session ? (
+            <Link href='/booking' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
+              <FaUserAlt className='mr-2' /> Booking
+            </Link>
+          ) : null}
           <Link href='/company' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
             <FaBuilding className='mr-2' /> Company
           </Link>
