@@ -12,7 +12,8 @@ interface BookingFormModalProps {
   onSave: () => void;
   onClose: () => void;
   isEdit: boolean;
-  companies: ICompany[]; // Add companies prop to provide list of companies for dropdown
+  companies: ICompany[];
+  validationMessage: string; // รับ validation message เป็น prop
 }
 
 const BookingFormModal: React.FC<BookingFormModalProps> = ({
@@ -23,6 +24,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
   onClose,
   isEdit,
   companies,
+  validationMessage,
 }) => (
   <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm'>
     <div className='bg-white p-10 rounded-lg shadow-lg w-full max-w-lg'>
@@ -45,6 +47,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
             </option>
           ))}
         </select>
+        {validationMessage && <p className='text-red-500 text-sm mt-2'>{validationMessage}</p>}
       </div>
       <div className='mb-6'>
         <label htmlFor='bookingDate' className='block text-gray-700 mb-2'>

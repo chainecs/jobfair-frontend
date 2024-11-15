@@ -30,6 +30,7 @@ const BookingManagement: React.FC = () => {
     message: "",
     isVisible: false,
   });
+  const [validationMessage, setValidationMessage] = useState<string>("");
 
   useEffect(() => {
     const getBookings = async () => {
@@ -88,6 +89,7 @@ const BookingManagement: React.FC = () => {
     if (name === "company") {
       const selectedCompany = companies.find((company) => company._id === value) || null;
       setFormData((prev) => ({ ...prev, company: selectedCompany }));
+      if (validationMessage) setValidationMessage("");
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -100,12 +102,17 @@ const BookingManagement: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (!formData.company?._id) {
+      setValidationMessage("Please select a company before saving.");
+      return;
+    }
+
     try {
       if (selectedBooking) {
         await updateBooking(selectedBooking._id!, formData);
         await listBookings();
         showMessageModal("Booking updated successfully.");
-      } else if (formData.company?._id) {
+      } else {
         if (bookings.length >= 3) {
           showMessageModal("You can only book up to 3 times.");
           return;
@@ -114,6 +121,7 @@ const BookingManagement: React.FC = () => {
         await listBookings();
         showMessageModal("Booking created successfully.");
       }
+      setValidationMessage(""); // Clear validation message on success
       closeModal();
     } catch (error) {
       console.error("Failed to save booking:", error);
@@ -165,6 +173,7 @@ const BookingManagement: React.FC = () => {
           onClose={closeModal}
           isEdit={!!selectedBooking}
           companies={companies}
+          validationMessage={validationMessage} // Pass validation message
         />
       )}
 
