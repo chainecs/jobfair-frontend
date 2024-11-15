@@ -39,6 +39,8 @@ const CompanyList: React.FC = () => {
   });
   const [errors, setErrors] = useState<Partial<ICompany>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -143,7 +145,7 @@ const CompanyList: React.FC = () => {
 
   const handleSave = async () => {
     if (!validateForm()) return;
-
+    setIsSaving(true);
     try {
       if (selectedCompany) {
         const updatedCompany = await updateCompany(selectedCompany._id!, companyFormData);
@@ -158,10 +160,13 @@ const CompanyList: React.FC = () => {
     } catch (error) {
       console.error("Failed to save company:", error);
       showMessageModal("Failed to save company.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleDelete = async () => {
+    setIsDeleting(true);
     try {
       if (selectedCompany) {
         await deleteCompany(selectedCompany._id!);
@@ -172,6 +177,8 @@ const CompanyList: React.FC = () => {
     } catch (error) {
       console.error("Failed to delete company:", error);
       showMessageModal("Failed to delete company.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -211,10 +218,18 @@ const CompanyList: React.FC = () => {
           onClose={closeModal}
           isEdit={!!selectedCompany}
           errors={errors}
+          isSaving={isSaving}
         />
       )}
 
-      {isDeleteModalOpen && <DeleteConfirmationModal onConfirm={handleDelete} onClose={closeDeleteModal} />}
+      {isDeleteModalOpen && (
+        <DeleteConfirmationModal
+          onConfirm={handleDelete}
+          onClose={closeDeleteModal}
+          isDeleting={isDeleting}
+          company={selectedCompany}
+        />
+      )}
 
       {messageModal.isVisible && <MessageModal message={messageModal.message} onClose={closeMessageModal} />}
     </div>
