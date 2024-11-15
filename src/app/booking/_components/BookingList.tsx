@@ -121,7 +121,7 @@ const BookingManagement: React.FC = () => {
         await listBookings();
         showMessageModal("Booking created successfully.");
       }
-      setValidationMessage(""); // Clear validation message on success
+      setValidationMessage("");
       closeModal();
     } catch (error) {
       console.error("Failed to save booking:", error);
@@ -173,7 +173,7 @@ const BookingManagement: React.FC = () => {
           onClose={closeModal}
           isEdit={!!selectedBooking}
           companies={companies}
-          validationMessage={validationMessage} // Pass validation message
+          validationMessage={validationMessage}
         />
       )}
 

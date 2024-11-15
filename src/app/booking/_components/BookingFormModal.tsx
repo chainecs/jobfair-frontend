@@ -13,7 +13,7 @@ interface BookingFormModalProps {
   onClose: () => void;
   isEdit: boolean;
   companies: ICompany[];
-  validationMessage: string; // รับ validation message เป็น prop
+  validationMessage: string;
 }
 
 const BookingFormModal: React.FC<BookingFormModalProps> = ({

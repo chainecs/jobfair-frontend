@@ -9,7 +9,6 @@ interface BookingCardProps {
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking, onEdit, onDelete }) => {
-  // Convert bookingDate to a Date object if it's a string
   const bookingDate = new Date(booking.bookingDate);
 
   return (

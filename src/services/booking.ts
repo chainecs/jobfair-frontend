@@ -6,7 +6,6 @@ import { IBooking } from "@/@types/IBooking";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/authOptions";
 
-// Helper function to get authorization headers
 const getAuthHeaders = async () => {
   const session = await getServerSession(authOptions);
   const token = session?.user?.token;
@@ -20,7 +19,6 @@ const getAuthHeaders = async () => {
   };
 };
 
-// Fetch all bookings
 export const fetchBookings = async (): Promise<IBooking[]> => {
   try {
     const headers = await getAuthHeaders();
@@ -32,7 +30,6 @@ export const fetchBookings = async (): Promise<IBooking[]> => {
   }
 };
 
-// Create a new booking
 export const createBooking = async (companyId: string, bookingData: Partial<IBooking>): Promise<IBooking> => {
   try {
     const headers = await getAuthHeaders();
@@ -48,7 +45,6 @@ export const createBooking = async (companyId: string, bookingData: Partial<IBoo
   }
 };
 
-// Update an existing booking
 export const updateBooking = async (id: string, formData: Partial<IBooking>): Promise<IBooking> => {
   try {
     const headers = await getAuthHeaders();
@@ -63,11 +59,10 @@ export const updateBooking = async (id: string, formData: Partial<IBooking>): Pr
   }
 };
 
-// Delete a booking
 export const deleteBooking = async (id: string): Promise<void> => {
   try {
     const headers = await getAuthHeaders();
-    const response = await api.delete(`/api/v1/bookings/${id}`, { headers });
+    await api.delete(`/api/v1/bookings/${id}`, { headers });
   } catch (error) {
     console.error("Error in deleteBooking:", error);
     throw error;

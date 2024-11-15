@@ -16,7 +16,7 @@ export const authOptions: AuthOptions = {
         const user = await userLogIn(credentials.username, credentials.password);
 
         if (user && user.role) {
-          return user; // Include role and token in the user object
+          return user;
         }
         return null;
       },
@@ -34,7 +34,7 @@ export const authOptions: AuthOptions = {
         token.id = user._id;
         token.email = user.email;
         token.role = user.role;
-        token.token = user.token; // Add token to the JWT payload
+        token.token = user.token;
       }
       return token;
     },
@@ -44,7 +44,7 @@ export const authOptions: AuthOptions = {
         id: token.id as string,
         email: token.email as string,
         role: token.role as string,
-        token: token.token as string, // Set the token on session.user
+        token: token.token as string,
       };
       return session;
     },

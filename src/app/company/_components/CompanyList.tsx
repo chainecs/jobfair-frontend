@@ -37,7 +37,6 @@ const CompanyList: React.FC = () => {
   });
   const [errors, setErrors] = useState<Partial<ICompany>>({});
 
-  // Fetch companies on component mount
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
@@ -102,29 +101,24 @@ const CompanyList: React.FC = () => {
   const validateForm = () => {
     const newErrors: Partial<ICompany> = {};
 
-    // ตรวจสอบ name
     if (!companyFormData.name.trim()) {
       newErrors.name = "Name is required.";
     } else if (companyFormData.name.length > 50) {
       newErrors.name = "Name cannot be more than 50 characters.";
     }
 
-    // ตรวจสอบ business
     if (!companyFormData.business.trim()) {
       newErrors.business = "Business description is required.";
     }
 
-    // ตรวจสอบ address
     if (!companyFormData.address.trim()) {
       newErrors.address = "Address is required.";
     }
 
-    // ตรวจสอบ province
     if (!companyFormData.province.trim()) {
       newErrors.province = "Province is required.";
     }
 
-    // ตรวจสอบ postalcode
     if (!companyFormData.postalcode.trim()) {
       newErrors.postalcode = "Postal code is required.";
     } else if (!/^\d+$/.test(companyFormData.postalcode.trim())) {
@@ -133,7 +127,6 @@ const CompanyList: React.FC = () => {
       newErrors.postalcode = "Postal code cannot be more than 5 digits.";
     }
 
-    // ตรวจสอบ picture
     if (!companyFormData.picture.trim()) {
       newErrors.picture = "Picture URL is required.";
     } else if (!/^https?:\/\/.+\..+$/.test(companyFormData.picture.trim())) {

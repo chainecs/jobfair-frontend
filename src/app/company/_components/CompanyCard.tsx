@@ -5,9 +5,9 @@ import { ICompany } from "@/@types/ICompany";
 
 interface CompanyCardProps {
   company: ICompany;
-  onEdit?: () => void; // Make onEdit optional
-  onDelete?: () => void; // Make onDelete optional
-  isAdmin: boolean; // Add an isAdmin prop to check user role
+  onEdit?: () => void;
+  onDelete?: () => void;
+  isAdmin: boolean;
 }
 
 const fallbackImage = "/images/fallback.jpg";
@@ -44,7 +44,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, onEdit, onDelete, is
         </p>
         {company.tel && <p className='text-gray-500'>Tel: {company.tel}</p>}
       </div>
-      {isAdmin && ( // Conditionally render buttons if the user is an admin
+      {isAdmin && (
         <div className='mt-auto flex justify-between'>
           <button
             onClick={onEdit}

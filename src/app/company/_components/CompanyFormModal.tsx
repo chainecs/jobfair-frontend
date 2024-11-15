@@ -8,7 +8,7 @@ interface CompanyFormModalProps {
   onSave: () => void;
   onClose: () => void;
   isEdit: boolean;
-  errors: Partial<ICompany>; // Add errors prop to display validation errors
+  errors: Partial<ICompany>;
 }
 
 const CompanyFormModal: React.FC<CompanyFormModalProps> = ({ formData, onChange, onSave, onClose, isEdit, errors }) => (
