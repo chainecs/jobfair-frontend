@@ -7,6 +7,7 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { ICompany } from "@/@types/ICompany";
 import { useSession } from "next-auth/react";
 import { useCompanyStore } from "@/store/company/useCompanyStore";
+import MessageModal from "@/components/MessageModal";
 
 const CompanyList: React.FC = () => {
   const { data: session } = useSession();
@@ -48,6 +49,19 @@ const CompanyList: React.FC = () => {
     };
     fetchCompanies();
   }, [listCompanies, setCompanies]);
+
+  const [messageModal, setMessageModal] = useState<{ message: string; isVisible: boolean }>({
+    message: "",
+    isVisible: false,
+  });
+
+  const showMessageModal = (message: string) => {
+    setMessageModal({ message, isVisible: true });
+  };
+
+  const closeMessageModal = () => {
+    setMessageModal({ message: "", isVisible: false });
+  };
 
   const openModal = (company?: ICompany) => {
     if (company) {
@@ -120,13 +134,16 @@ const CompanyList: React.FC = () => {
       if (selectedCompany) {
         const updatedCompany = await updateCompany(selectedCompany._id!, companyFormData);
         setCompanies(companies.map((c) => (c._id === selectedCompany._id ? updatedCompany : c)));
+        showMessageModal("Company updated successfully.");
       } else {
         const newCompany = await createCompany(companyFormData);
         setCompanies([...companies, newCompany]);
+        showMessageModal("Company created successfully.");
       }
       closeModal();
     } catch (error) {
       console.error("Failed to save company:", error);
+      showMessageModal("Failed to save company.");
     }
   };
 
@@ -135,10 +152,12 @@ const CompanyList: React.FC = () => {
       if (selectedCompany) {
         await deleteCompany(selectedCompany._id!);
         setCompanies(companies.filter((c) => c._id !== selectedCompany._id));
+        showMessageModal("Company deleted successfully.");
         closeDeleteModal();
       }
     } catch (error) {
       console.error("Failed to delete company:", error);
+      showMessageModal("Failed to delete company.");
     }
   };
 
@@ -178,6 +197,8 @@ const CompanyList: React.FC = () => {
       )}
 
       {isDeleteModalOpen && <DeleteConfirmationModal onConfirm={handleDelete} onClose={closeDeleteModal} />}
+
+      {messageModal.isVisible && <MessageModal message={messageModal.message} onClose={closeMessageModal} />}
     </div>
   );
 };
