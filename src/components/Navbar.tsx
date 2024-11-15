@@ -7,6 +7,7 @@ import { userLogOut } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { FaUserAlt, FaBuilding, FaSignOutAlt, FaSignInAlt } from "react-icons/fa"; // Import ไอคอน
 import { MdMenu } from "react-icons/md";
+import { FaBriefcase } from "react-icons/fa";
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -31,11 +32,12 @@ const Navbar: React.FC = () => {
   return (
     <nav className='bg-white border-b'>
       <div className='container mx-auto px-6 py-4 flex justify-between items-center border-b'>
-        <div className='flex items-center'>
-          <Link href='/' className='text-2xl font-bold text-blue-600'>
-            JobFair
-          </Link>
-        </div>
+        <Link href='/'>
+          <div className='flex items-center space-x-3'>
+            <FaBriefcase className='text-blue-600 text-3xl' />
+            <div className='text-2xl font-bold text-blue-600'>JobFair</div>
+          </div>
+        </Link>
 
         {/* Desktop Menu */}
         <div className='hidden md:flex items-center space-x-8'>

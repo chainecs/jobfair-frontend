@@ -25,17 +25,17 @@ export default function Home() {
       </div>
       <div className='mt-16 w-full max-w-5xl flex flex-wrap justify-center gap-8'>
         <div className='text-center p-6 bg-white shadow-lg rounded-lg w-64 flex flex-col items-center'>
-          <FaSearch className='text-blue-600 text-4xl mb-4' /> {/* Add icon */}
+          <FaSearch className='text-blue-600 text-4xl mb-4' />
           <h2 className='text-2xl font-semibold text-blue-600'>ค้นหางาน</h2>
           <p className='text-gray-700 mt-2'>ค้นหาโอกาสงานที่เหมาะกับคุณจากบริษัทหลากหลายที่ร่วมเข้าร่วมกับเรา</p>
         </div>
         <div className='text-center p-6 bg-white shadow-lg rounded-lg w-64 flex flex-col items-center'>
-          <FaBuilding className='text-blue-600 text-4xl mb-4' /> {/* Add icon */}
+          <FaBuilding className='text-blue-600 text-4xl mb-4' />
           <h2 className='text-2xl font-semibold text-blue-600'>ค้นหาบริษัท</h2>
           <p className='text-gray-700 mt-2'>สำรวจบริษัทต่างๆ และเรียนรู้เกี่ยวกับโอกาสและวิสัยทัศน์ของแต่ละองค์กร</p>
         </div>
         <div className='text-center p-6 bg-white shadow-lg rounded-lg w-64 flex flex-col items-center'>
-          <FaUserPlus className='text-blue-600 text-4xl mb-4' /> {/* Add icon */}
+          <FaUserPlus className='text-blue-600 text-4xl mb-4' />
           <h2 className='text-2xl font-semibold text-blue-600'>ลงทะเบียนผู้สมัคร</h2>
           <p className='text-gray-700 mt-2'>สมัครสมาชิกและสร้างโปรไฟล์เพื่อเพิ่มโอกาสในการหางานที่เหมาะกับคุณ</p>
         </div>
