@@ -1,7 +1,6 @@
-// useBookingStore.ts
 import { create } from "zustand";
-import { createBooking, fetchBookings, updateBooking, deleteBooking } from "@/services/booking";
 import { IBooking } from "@/@types/IBooking";
+import { fetchBookings, createBooking as serverCreateBooking, updateBooking, deleteBooking } from "@/services/booking";
 
 // Define the initial state structure
 interface IBookingState {
@@ -18,7 +17,7 @@ interface IBookingActions {
 // Define action request types
 interface IBookingActionRequest {
   listBookings: () => Promise<IBooking[]>;
-  createBooking: (formData: Partial<IBooking>) => Promise<IBooking>;
+  createBooking: (companyId: string, bookingData: Partial<IBooking>) => Promise<IBooking>;
   updateBooking: (id: string, formData: Partial<IBooking>) => Promise<IBooking>;
   deleteBooking: (id: string) => Promise<void>;
 }
@@ -48,8 +47,8 @@ export const useBookingStore = create<IBookingStore>((set) => ({
     return data;
   },
 
-  createBooking: async (formData) => {
-    const newBooking = await createBooking(formData);
+  createBooking: async (companyId, bookingData) => {
+    const newBooking = await serverCreateBooking(companyId, bookingData);
     set((state) => ({ bookings: [...state.bookings, newBooking] }));
     return newBooking;
   },

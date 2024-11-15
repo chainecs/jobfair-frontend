@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import api from "@/libs/api";
@@ -24,11 +25,7 @@ export const fetchBookings = async (): Promise<IBooking[]> => {
   try {
     const headers = await getAuthHeaders();
     const response = await api.get("/api/v1/bookings", { headers });
-
-    if (response.status === 200 && Array.isArray(response.data.data)) {
-      return response.data.data;
-    }
-    throw new Error("Failed to fetch bookings");
+    return response.data.data;
   } catch (error) {
     console.error("Error in fetchBookings:", error);
     throw error;
@@ -36,17 +33,17 @@ export const fetchBookings = async (): Promise<IBooking[]> => {
 };
 
 // Create a new booking
-export const createBooking = async (formData: Partial<IBooking>): Promise<IBooking> => {
+export const createBooking = async (companyId: string, bookingData: Partial<IBooking>): Promise<IBooking> => {
   try {
     const headers = await getAuthHeaders();
-    const response = await api.post("/api/v1/bookings", formData, { headers });
+    const response = await api.post(`/api/v1/companies/${companyId}/bookings`, bookingData, { headers });
 
-    if (response.status === 201) {
-      return response.data;
-    }
-    throw new Error("Failed to create booking");
+    return response.data;
   } catch (error) {
     console.error("Error in createBooking:", error);
+    if ((error as any).response?.data?.message) {
+      throw new Error((error as any).response.data.message);
+    }
     throw error;
   }
 };
@@ -56,13 +53,12 @@ export const updateBooking = async (id: string, formData: Partial<IBooking>): Pr
   try {
     const headers = await getAuthHeaders();
     const response = await api.put(`/api/v1/bookings/${id}`, formData, { headers });
-
-    if (response.status === 200) {
-      return response.data;
-    }
-    throw new Error("Failed to update booking");
+    return response.data;
   } catch (error) {
     console.error("Error in updateBooking:", error);
+    if ((error as any).response?.data?.message) {
+      throw new Error((error as any).response.data.message);
+    }
     throw error;
   }
 };
@@ -72,10 +68,6 @@ export const deleteBooking = async (id: string): Promise<void> => {
   try {
     const headers = await getAuthHeaders();
     const response = await api.delete(`/api/v1/bookings/${id}`, { headers });
-
-    if (response.status !== 200) {
-      throw new Error("Failed to delete booking");
-    }
   } catch (error) {
     console.error("Error in deleteBooking:", error);
     throw error;

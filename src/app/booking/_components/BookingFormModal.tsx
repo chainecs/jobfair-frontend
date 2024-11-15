@@ -1,16 +1,18 @@
 "use client";
 
+import { ICompany } from "@/@types/ICompany";
 import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface BookingFormModalProps {
-  formData: { bookingDate: Date; company: string };
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  formData: { bookingDate: Date; company: ICompany | null };
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onDateChange: (date: Date | null) => void;
   onSave: () => void;
   onClose: () => void;
   isEdit: boolean;
+  companies: ICompany[]; // Add companies prop to provide list of companies for dropdown
 }
 
 const BookingFormModal: React.FC<BookingFormModalProps> = ({
@@ -20,6 +22,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
   onSave,
   onClose,
   isEdit,
+  companies,
 }) => (
   <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
     <div className='bg-white p-10 rounded-lg shadow-lg w-full max-w-lg'>
@@ -28,15 +31,20 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
         <label htmlFor='company' className='block text-gray-700 mb-2'>
           Company
         </label>
-        <input
-          type='text'
+        <select
           id='company'
           name='company'
-          value={formData.company}
+          value={formData.company?._id || ""}
           onChange={onChange}
           className='w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600'
-          required
-        />
+          required>
+          <option value=''>Select a company</option>
+          {companies.map((company) => (
+            <option key={company._id} value={company._id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
       </div>
       <div className='mb-6'>
         <label htmlFor='bookingDate' className='block text-gray-700 mb-2'>

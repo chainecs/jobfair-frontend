@@ -5,7 +5,10 @@ import BookingCard from "./BookingCard";
 import BookingFormModal from "./BookingFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import { IBooking } from "@/@types/IBooking";
+import { ICompany } from "@/@types/ICompany";
 import { useBookingStore } from "@/store/bookings/useBookingStore";
+import { fetchCompanies } from "@/services/company";
+import { fetchBookings } from "@/services/booking";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -21,19 +24,30 @@ const BookingManagement: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ bookingDate: new Date(), company: null });
+  const [formData, setFormData] = useState<IBooking>({ bookingDate: new Date(), company: null });
+  const [companies, setCompanies] = useState<ICompany[]>([]);
 
-  // Fetch bookings on component mount
   useEffect(() => {
     const getBookings = async () => {
       try {
         const bookingsData = await listBookings();
+        console.log("bookingsData", bookingsData);
         setBookings(bookingsData);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }
     };
     getBookings();
+
+    const getCompanies = async () => {
+      try {
+        const companiesData = await fetchCompanies();
+        setCompanies(companiesData);
+      } catch (error) {
+        console.error("Failed to fetch companies:", error);
+      }
+    };
+    getCompanies();
   }, [listBookings, setBookings]);
 
   const openModal = (booking?: IBooking) => {
@@ -42,7 +56,7 @@ const BookingManagement: React.FC = () => {
       setFormData({ bookingDate: new Date(booking.bookingDate), company: booking.company });
     } else {
       setSelectedBooking(null);
-      setFormData({ bookingDate: new Date(), company: "" });
+      setFormData({ bookingDate: new Date(), company: null });
     }
     setIsModalOpen(true);
   };
@@ -56,8 +70,15 @@ const BookingManagement: React.FC = () => {
 
   const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "company") {
+      const selectedCompany = companies.find((company) => company._id === value) || null;
+      setFormData((prev) => ({ ...prev, company: selectedCompany }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleDateChange = (date: Date | null) => {
@@ -69,14 +90,17 @@ const BookingManagement: React.FC = () => {
   const handleSave = async () => {
     try {
       if (selectedBooking) {
-        // Update existing booking
         const updatedBooking = await updateBooking(selectedBooking._id!, formData);
-        setBookings(bookings.map((b) => (b._id === selectedBooking._id ? updatedBooking : b)));
-      } else {
-        // Create new booking
-        const newBooking = await createBooking(formData);
-        setBookings([...bookings, newBooking]);
+        alert("Booking updated successfully.");
+      } else if (formData.company?._id) {
+        if (bookings.length >= 3) {
+          alert("You can only book up to 3 times.");
+          return;
+        }
+        const newBooking = await createBooking(formData.company._id, formData);
+        alert("Booking created successfully.");
       }
+      await listBookings();
       closeModal();
     } catch (error) {
       console.error("Failed to save booking:", error);
@@ -88,6 +112,7 @@ const BookingManagement: React.FC = () => {
       if (selectedBooking) {
         await deleteBooking(selectedBooking._id!);
         setBookings(bookings.filter((b) => b._id !== selectedBooking._id));
+        alert("Booking deleted successfully.");
         closeDeleteModal();
       }
     } catch (error) {
@@ -106,9 +131,9 @@ const BookingManagement: React.FC = () => {
         </button>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-        {bookings.map((booking) => (
+        {bookings.map((booking, index) => (
           <BookingCard
-            key={booking._id}
+            key={booking._id || index}
             booking={booking}
             onEdit={() => openModal(booking)}
             onDelete={() => openDeleteModal(booking)}
@@ -124,6 +149,7 @@ const BookingManagement: React.FC = () => {
           onSave={handleSave}
           onClose={closeModal}
           isEdit={!!selectedBooking}
+          companies={companies}
         />
       )}
 

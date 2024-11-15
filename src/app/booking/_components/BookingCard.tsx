@@ -14,9 +14,9 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onEdit, onDelete }) 
 
   return (
     <div className='bg-white shadow-lg rounded-lg p-6'>
-      <p className='text-lg font-semibold text-gray-700'>Company: {booking.company.name}</p>
-      <p className='text-md text-gray-500'>Address: {booking.company.address}</p>
-      <p className='text-md text-gray-500'>Phone: {booking.company.tel}</p>
+      <p className='text-lg font-semibold text-gray-700'>Company: {booking.company?.name}</p>
+      <p className='text-md text-gray-500'>Address: {booking.company?.address}</p>
+      <p className='text-md text-gray-500'>Phone: {booking.company?.tel}</p>
       <p className='text-md text-gray-500'>Booking Date: {bookingDate.toDateString()}</p>
       <div className='mt-6 flex justify-between'>
         <button
