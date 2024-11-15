@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { FaUserAlt, FaBuilding, FaSignOutAlt, FaSignInAlt } from "react-icons/fa"; // Import ไอคอน
 import { MdMenu } from "react-icons/md";
 import { FaBriefcase } from "react-icons/fa";
+import axios from "axios";
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -21,7 +22,8 @@ const Navbar: React.FC = () => {
   const handleSignOut = async () => {
     setIsMenuOpen(false);
     try {
-      await userLogOut();
+      // await userLogOut();
+      await axios.get("/api/auth/logout");
       signOut();
       router.push("/");
     } catch (error) {
