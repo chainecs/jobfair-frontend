@@ -8,7 +8,7 @@ import { IBooking } from "@/@types/IBooking";
 import { ICompany } from "@/@types/ICompany";
 import { useBookingStore } from "@/store/bookings/useBookingStore";
 import { fetchCompanies } from "@/services/company";
-import { fetchBookings } from "@/services/booking";
+import MessageModal from "@/components/MessageModal";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -26,6 +26,10 @@ const BookingManagement: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState<IBooking>({ bookingDate: new Date(), company: null });
   const [companies, setCompanies] = useState<ICompany[]>([]);
+  const [messageModal, setMessageModal] = useState<{ message: string; isVisible: boolean }>({
+    message: "",
+    isVisible: false,
+  });
 
   useEffect(() => {
     const getBookings = async () => {
@@ -70,6 +74,14 @@ const BookingManagement: React.FC = () => {
 
   const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
+  const showMessageModal = (message: string) => {
+    setMessageModal({ message, isVisible: true });
+  };
+
+  const closeMessageModal = () => {
+    setMessageModal({ message: "", isVisible: false });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
@@ -91,19 +103,20 @@ const BookingManagement: React.FC = () => {
     try {
       if (selectedBooking) {
         const updatedBooking = await updateBooking(selectedBooking._id!, formData);
-        alert("Booking updated successfully.");
+        showMessageModal("Booking updated successfully.");
       } else if (formData.company?._id) {
         if (bookings.length >= 3) {
-          alert("You can only book up to 3 times.");
+          showMessageModal("You can only book up to 3 times.");
           return;
         }
         const newBooking = await createBooking(formData.company._id, formData);
-        alert("Booking created successfully.");
+        showMessageModal("Booking created successfully.");
       }
       await listBookings();
       closeModal();
     } catch (error) {
       console.error("Failed to save booking:", error);
+      showMessageModal("Failed to save booking.");
     }
   };
 
@@ -111,12 +124,13 @@ const BookingManagement: React.FC = () => {
     try {
       if (selectedBooking) {
         await deleteBooking(selectedBooking._id!);
-        setBookings(bookings.filter((b) => b._id !== selectedBooking._id));
-        alert("Booking deleted successfully.");
+        await listBookings();
+        showMessageModal("Booking deleted successfully.");
         closeDeleteModal();
       }
     } catch (error) {
       console.error("Failed to delete booking:", error);
+      showMessageModal("Failed to delete booking.");
     }
   };
 
@@ -154,6 +168,7 @@ const BookingManagement: React.FC = () => {
       )}
 
       {isDeleteModalOpen && <DeleteConfirmationModal onConfirm={handleDelete} onClose={closeDeleteModal} />}
+      {messageModal.isVisible && <MessageModal message={messageModal.message} onClose={closeMessageModal} />}
     </div>
   );
 };
