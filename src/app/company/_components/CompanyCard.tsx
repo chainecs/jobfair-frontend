@@ -49,7 +49,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company, onEdit, onDelete, is
         <div className='mt-auto flex justify-between'>
           <button
             onClick={onEdit}
-            className='bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all shadow-md flex items-center'>
+            className='bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all shadow-md flex items-center'>
             <FaEdit className='mr-2' /> Edit
           </button>
           <button
