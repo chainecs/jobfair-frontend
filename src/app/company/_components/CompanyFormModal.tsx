@@ -27,6 +27,7 @@ const CompanyFormModal: React.FC<CompanyFormModalProps> = ({ formData, onChange,
             value={formData[field as keyof ICompany]}
             onChange={onChange}
             className='w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600'
+            maxLength={field === "name" ? 50 : undefined}
           />
           {errors[field as keyof ICompany] && (
             <p className='text-red-500 text-sm mt-1'>{errors[field as keyof ICompany]}</p>

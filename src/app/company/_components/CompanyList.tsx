@@ -102,24 +102,41 @@ const CompanyList: React.FC = () => {
   const validateForm = () => {
     const newErrors: Partial<ICompany> = {};
 
-    if (!companyFormData.name.trim()) newErrors.name = "Name is required.";
-    if (!companyFormData.business.trim()) newErrors.business = "Business type is required.";
-    if (!companyFormData.address.trim()) newErrors.address = "Address is required.";
-    if (!companyFormData.province.trim()) newErrors.province = "Province is required.";
+    // ตรวจสอบ name
+    if (!companyFormData.name.trim()) {
+      newErrors.name = "Name is required.";
+    } else if (companyFormData.name.length > 50) {
+      newErrors.name = "Name cannot be more than 50 characters.";
+    }
 
+    // ตรวจสอบ business
+    if (!companyFormData.business.trim()) {
+      newErrors.business = "Business description is required.";
+    }
+
+    // ตรวจสอบ address
+    if (!companyFormData.address.trim()) {
+      newErrors.address = "Address is required.";
+    }
+
+    // ตรวจสอบ province
+    if (!companyFormData.province.trim()) {
+      newErrors.province = "Province is required.";
+    }
+
+    // ตรวจสอบ postalcode
     if (!companyFormData.postalcode.trim()) {
       newErrors.postalcode = "Postal code is required.";
-    } else if (!/^\d{5}$/.test(companyFormData.postalcode.trim())) {
-      newErrors.postalcode = "Postal code must be a 5-digit number.";
+    } else if (!/^\d+$/.test(companyFormData.postalcode.trim())) {
+      newErrors.postalcode = "Postal code must be numeric.";
+    } else if (companyFormData.postalcode.trim().length > 5) {
+      newErrors.postalcode = "Postal code cannot be more than 5 digits.";
     }
 
-    if (!companyFormData.tel.trim()) {
-      newErrors.tel = "Telephone number is required.";
-    } else if (!/^\d{10}$/.test(companyFormData.tel.trim())) {
-      newErrors.tel = "Telephone number must be a 10-digit number.";
-    }
-
-    if (companyFormData.picture && !/^https?:\/\/.+\..+$/.test(companyFormData.picture.trim())) {
+    // ตรวจสอบ picture
+    if (!companyFormData.picture.trim()) {
+      newErrors.picture = "Picture URL is required.";
+    } else if (!/^https?:\/\/.+\..+$/.test(companyFormData.picture.trim())) {
       newErrors.picture = "Picture must be a valid URL (e.g., https://picsum.photos/200/300?random=1).";
     }
 
