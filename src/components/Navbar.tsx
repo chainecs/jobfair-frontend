@@ -52,11 +52,11 @@ const Navbar: React.FC = () => {
             <FaBuilding className='mr-2' /> Company
           </Link>
           {session ? (
-            <button
+            <div
               onClick={handleSignOut}
-              className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
+              className='text-gray-700 hover:text-blue-600 transition-all flex items-center cursor-pointer'>
               <FaSignOutAlt className='mr-2' /> Logout from {session.user.name || session.user.email}
-            </button>
+            </div>
           ) : (
             <Link href='/login' className='text-gray-700 hover:text-blue-600 transition-all flex items-center'>
               <FaSignInAlt className='mr-2' /> Login

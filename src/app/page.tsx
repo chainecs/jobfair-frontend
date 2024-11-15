@@ -10,7 +10,7 @@ export default function Home() {
           JobFair เป็นแพลตฟอร์มสำหรับการนัดหมายงานและการค้นหาบริษัทที่ตรงกับความสามารถและความสนใจของคุณ
           เข้าร่วมกับเราเพื่อค้นหาโอกาสงานจากบริษัทชั้นนำที่เหมาะกับคุณและเชื่อมโยงกับผู้ว่าจ้างที่ใช่
         </p>
-        <div className='space-x-4'>
+        <div className='flex flex-row gap-4 justify-center align-center'>
           <Link href='/booking'>
             <button className='px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition'>
               เริ่มค้นหาโอกาสงาน
