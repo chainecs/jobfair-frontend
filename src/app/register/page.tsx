@@ -12,19 +12,78 @@ const Register: React.FC = () => {
     tel: "",
     password: "",
   });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // เพิ่ม state สำหรับ loading
-  const [modalMessage, setModalMessage] = useState<string | null>(null); // State สำหรับ modal
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    tel: "",
+    password: "",
+    general: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      name: "",
+      email: "",
+      tel: "",
+      password: "",
+      general: "",
+    };
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required.";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is not valid.";
+    }
+
+    if (!formData.tel.trim()) {
+      newErrors.tel = "Telephone is required.";
+    } else if (!/^\d{10}$/.test(formData.tel)) {
+      newErrors.tel = "Telephone must be a valid 10-digit number.";
+    }
+
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required.";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+
+    setErrors(newErrors);
+
+    // Return true if there are no errors
+    return !Object.values(newErrors).some((error) => error);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true); // เริ่ม loading
+    setErrors({
+      name: "",
+      email: "",
+      tel: "",
+      password: "",
+      general: "",
+    });
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -35,21 +94,26 @@ const Register: React.FC = () => {
       });
 
       const result = await response.json();
-      setIsLoading(false); // หยุด loading
+      setIsLoading(false);
+
       if (result.success) {
-        setModalMessage("Registration successful!"); // แสดงข้อความสำเร็จใน Modal
+        setModalMessage("Registration successful!");
       } else {
-        setError("Registration failed. Please try again.");
+        if (result.error.includes("Email already exists")) {
+          setErrors((prev) => ({ ...prev, email: result.error }));
+        } else {
+          setErrors((prev) => ({ ...prev, general: result.error }));
+        }
       }
     } catch (err) {
-      setIsLoading(false); // หยุด loading
-      setError("Server error. Please try again later.");
+      setIsLoading(false);
+      setErrors((prev) => ({ ...prev, general: "Server error. Please try again later." }));
     }
   };
 
   const handleModalClose = () => {
-    setModalMessage(null); // ปิด Modal
-    router.push("/login"); // ไปที่หน้า Login
+    setModalMessage(null);
+    router.push("/login");
   };
 
   return (
@@ -57,8 +121,8 @@ const Register: React.FC = () => {
       {modalMessage && <MessageModal message={modalMessage} onClose={handleModalClose} />}
       <div className='bg-white p-8 rounded-lg shadow-md w-full max-w-md px-6'>
         <h2 className='text-2xl font-bold mb-6 text-center'>Register</h2>
-        {error && <p className='text-red-500 text-center mb-4'>{error}</p>}
         <form onSubmit={handleSubmit}>
+          {errors.general && <p className='text-red-500 text-center mb-4'>{errors.general}</p>}
           <div className='mb-4'>
             <label htmlFor='name' className='block text-gray-700 mb-2'>
               Name
@@ -70,8 +134,8 @@ const Register: React.FC = () => {
               value={formData.name}
               onChange={handleChange}
               className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600'
-              required
             />
+            {errors.name && <p className='text-red-500 text-sm mt-2'>{errors.name}</p>}
           </div>
           <div className='mb-4'>
             <label htmlFor='email' className='block text-gray-700 mb-2'>
@@ -84,8 +148,8 @@ const Register: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600'
-              required
             />
+            {errors.email && <p className='text-red-500 text-sm mt-2'>{errors.email}</p>}
           </div>
           <div className='mb-4'>
             <label htmlFor='tel' className='block text-gray-700 mb-2'>
@@ -98,8 +162,8 @@ const Register: React.FC = () => {
               value={formData.tel}
               onChange={handleChange}
               className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600'
-              required
             />
+            {errors.tel && <p className='text-red-500 text-sm mt-2'>{errors.tel}</p>}
           </div>
           <div className='mb-6'>
             <label htmlFor='password' className='block text-gray-700 mb-2'>
@@ -112,8 +176,8 @@ const Register: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600'
-              required
             />
+            {errors.password && <p className='text-red-500 text-sm mt-2'>{errors.password}</p>}
           </div>
           <button
             type='submit'

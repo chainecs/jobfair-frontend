@@ -44,13 +44,10 @@ export async function getMe(token: string) {
 export async function userRegister(formData: any) {
   try {
     const response = await api.post("/api/v1/auth/register", formData);
-    console.log("Registration respone:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Registration error:", error);
     if ((error as any).response?.data?.message) {
       throw new Error((error as any).response.data.message);
     }
-    throw error;
   }
 }
