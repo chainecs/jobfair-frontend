@@ -13,7 +13,8 @@ interface BookingFormModalProps {
   onClose: () => void;
   isEdit: boolean;
   companies: ICompany[];
-  validationMessage: string;
+  companyValidationMessage: string;
+  dateValidationMessage: string;
   isSaving: boolean;
 }
 
@@ -25,7 +26,8 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
   onClose,
   isEdit,
   companies,
-  validationMessage,
+  companyValidationMessage,
+  dateValidationMessage,
   isSaving,
 }) => (
   <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm'>
@@ -49,7 +51,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
             </option>
           ))}
         </select>
-        {validationMessage && <p className='text-red-500 text-sm mt-2'>{validationMessage}</p>}
+        {companyValidationMessage && <p className='text-red-500 text-sm mt-2'>{companyValidationMessage}</p>}
       </div>
       <div className='mb-6'>
         <label htmlFor='bookingDate' className='block text-gray-700 mb-2'>
@@ -61,6 +63,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
           className='w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600'
           required
         />
+        {dateValidationMessage && <p className='text-red-500 text-sm mt-2'>{dateValidationMessage}</p>}
       </div>
       <div className='flex justify-end'>
         <button

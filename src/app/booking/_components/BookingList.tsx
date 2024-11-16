@@ -36,7 +36,8 @@ const BookingManagement: React.FC = () => {
     message: "",
     isVisible: false,
   });
-  const [validationMessage, setValidationMessage] = useState<string>("");
+  const [companyValidationMessage, setCompanyValidationMessage] = useState<string>("");
+  const [dateValidationMessage, setDateValidationMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -100,7 +101,7 @@ const BookingManagement: React.FC = () => {
     if (name === "company") {
       const selectedCompany = companies.find((company) => company._id === value) || null;
       setFormData((prev) => ({ ...prev, company: selectedCompany }));
-      if (validationMessage) setValidationMessage("");
+      if (companyValidationMessage) setCompanyValidationMessage("");
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -108,13 +109,25 @@ const BookingManagement: React.FC = () => {
 
   const handleDateChange = (date: Date | null) => {
     if (date) {
-      setFormData({ ...formData, bookingDate: date });
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (date <= today) {
+        setDateValidationMessage("Booking date must be in the future.");
+      } else {
+        setDateValidationMessage("");
+        setFormData({ ...formData, bookingDate: date });
+      }
     }
   };
 
   const handleSave = async () => {
     if (!formData.company?._id) {
-      setValidationMessage("Please select a company before saving.");
+      setCompanyValidationMessage("Please select a company before saving.");
+      return;
+    }
+
+    if (dateValidationMessage) {
       return;
     }
 
@@ -133,7 +146,7 @@ const BookingManagement: React.FC = () => {
         await listBookings();
         showMessageModal("Booking created successfully.");
       }
-      setValidationMessage("");
+      setCompanyValidationMessage("");
       closeModal();
     } catch (error) {
       console.error("Failed to save booking:", error);
@@ -216,7 +229,8 @@ const BookingManagement: React.FC = () => {
           onClose={closeModal}
           isEdit={!!selectedBooking}
           companies={companies}
-          validationMessage={validationMessage}
+          companyValidationMessage={companyValidationMessage}
+          dateValidationMessage={dateValidationMessage}
           isSaving={isSaving}
         />
       )}
