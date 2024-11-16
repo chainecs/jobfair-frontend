@@ -28,6 +28,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
           Cancel
         </button>
         <button
+          id='confirm-delete-button'
           onClick={onConfirm}
           disabled={isDeleting}
           className={`flex items-center bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition-all shadow-md ${
