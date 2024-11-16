@@ -1,5 +1,3 @@
-// BookingManagement.tsx
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -35,8 +33,7 @@ const BookingManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState<IBooking>({
-    _id: "",
-    bookingDate: new Date(),
+    bookingDate: getTomorrow(),
     user: "",
     company: null,
     createdAt: new Date(),
@@ -52,6 +49,13 @@ const BookingManagement: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [filterUserId, setFilterUserId] = useState<string>("");
+
+  function getTomorrow(): Date {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return tomorrow;
+  }
 
   useEffect(() => {
     const getBookings = async () => {
@@ -86,13 +90,11 @@ const BookingManagement: React.FC = () => {
         bookingDate: new Date(booking.bookingDate),
         user: booking.user,
         company: booking.company,
-        createdAt: new Date(booking.createdAt),
       });
     } else {
       setSelectedBooking(null);
       setFormData({
-        _id: "",
-        bookingDate: new Date(),
+        bookingDate: getTomorrow(),
         user: "",
         company: null,
         createdAt: new Date(),
@@ -153,23 +155,31 @@ const BookingManagement: React.FC = () => {
       return;
     }
 
-    if (dateValidationMessage) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selectedDate = new Date(formData.bookingDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate <= today) {
+      setDateValidationMessage("Booking date must be in the future.");
       return;
+    } else {
+      setDateValidationMessage("");
     }
 
     setIsSaving(true);
     try {
-      if (formData._id !== "") {
-        // Existing booking
+      if (formData._id) {
         await updateBooking(formData._id, formData);
         showMessageModal("Booking updated successfully.");
       } else {
-        // New booking
+        const { ...newBooking } = formData;
         if (bookings.length >= 3) {
           showMessageModal("You can only book up to 3 times.");
           return;
         }
-        await createBooking(formData.company._id, formData);
+        await createBooking(formData.company._id, newBooking);
         showMessageModal("Booking created successfully.");
       }
       await listBookings();
@@ -191,7 +201,7 @@ const BookingManagement: React.FC = () => {
         return;
       }
 
-      await deleteBooking(selectedBooking._id);
+      await deleteBooking(selectedBooking._id!);
       await listBookings();
       showMessageModal("Booking deleted successfully.");
       closeDeleteModal();
@@ -257,7 +267,7 @@ const BookingManagement: React.FC = () => {
           onDateChange={handleDateChange}
           onSave={handleSave}
           onClose={closeModal}
-          isEdit={formData._id !== ""}
+          isEdit={!!formData._id}
           companies={companies}
           companyValidationMessage={companyValidationMessage}
           dateValidationMessage={dateValidationMessage}
