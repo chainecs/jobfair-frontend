@@ -12,7 +12,6 @@ import MessageModal from "@/components/MessageModal";
 import { MdAdd } from "react-icons/md";
 import Loading from "@/app/loading";
 import { useSession } from "next-auth/react";
-import { FaEdit } from "react-icons/fa";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -183,7 +182,7 @@ const BookingManagement: React.FC = () => {
               <input
                 type='text'
                 value={filterUserId}
-                onChange={(e) => setFilterUserId(e.target.value)} // อัปเดต User ID
+                onChange={(e) => setFilterUserId(e.target.value)}
                 placeholder='Enter User ID to filter'
                 className='border border-gray-300 rounded-lg px-4 py-2 w-full max-w-xs mr-2'
               />
