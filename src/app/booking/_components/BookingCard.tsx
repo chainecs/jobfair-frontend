@@ -7,10 +7,13 @@ interface BookingCardProps {
   booking: IBooking;
   onEdit: () => void;
   onDelete: () => void;
+  isAdmin?: boolean;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ booking, onEdit, onDelete }) => {
+const BookingCard: React.FC<BookingCardProps> = ({ booking, onEdit, onDelete, isAdmin }) => {
   const bookingDate = new Date(booking.bookingDate);
+
+  console.log("booking", booking);
 
   return (
     <div className='bg-white shadow-lg rounded-lg p-6 flex flex-col h-full' style={{ minHeight: "250px" }}>
@@ -19,6 +22,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, onEdit, onDelete }) 
         <p className='text-md text-gray-500'>Address: {booking.company?.address}</p>
         <p className='text-md text-gray-500'>Phone: {booking.company?.tel}</p>
         <p className='text-md text-gray-500'>Booking Date: {bookingDate.toDateString()}</p>
+        {isAdmin && <p className='text-md text-gray-500'>Booked By User id: {booking.user}</p>}
       </div>
       <div className='mt-auto flex justify-between'>
         <button

@@ -11,6 +11,8 @@ import { fetchCompanies } from "@/services/company";
 import MessageModal from "@/components/MessageModal";
 import { MdAdd } from "react-icons/md";
 import Loading from "@/app/loading";
+import { useSession } from "next-auth/react";
+import { FaEdit } from "react-icons/fa";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -24,6 +26,9 @@ const BookingManagement: React.FC = () => {
     deleteBooking,
   } = useBookingStore();
 
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin";
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState<IBooking>({ bookingDate: new Date(), company: null });
@@ -36,6 +41,7 @@ const BookingManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [filterUserId, setFilterUserId] = useState<string>("");
 
   useEffect(() => {
     const getBookings = async () => {
@@ -155,6 +161,8 @@ const BookingManagement: React.FC = () => {
     }
   };
 
+  const filteredBookings = filterUserId ? bookings.filter((booking) => booking.user === filterUserId) : bookings;
+
   if (isLoading) {
     return <Loading />;
   }
@@ -163,21 +171,39 @@ const BookingManagement: React.FC = () => {
     <div className='container mx-auto px-6 py-6'>
       <h2 className='text-3xl font-bold mb-8 text-center'>Booking</h2>
       <div className='flex justify-center mb-6'>
-        <div className='flex justify-center mb-6'>
-          <button
-            onClick={() => openModal()}
-            className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center'>
-            <MdAdd className='mr-2 text-lg' /> Create New Booking
-          </button>
+        <div className='flex justify-center'>
+          {!isAdmin ? (
+            <button
+              onClick={() => openModal()}
+              className='bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center'>
+              <MdAdd className='mr-2 text-lg' /> Create New Booking
+            </button>
+          ) : (
+            <div className='flex flex-row items-center align-center'>
+              <input
+                type='text'
+                value={filterUserId}
+                onChange={(e) => setFilterUserId(e.target.value)} // อัปเดต User ID
+                placeholder='Enter User ID to filter'
+                className='border border-gray-300 rounded-lg px-4 py-2 w-full max-w-xs mr-2'
+              />
+              <button
+                onClick={() => setFilterUserId("")}
+                className='bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center'>
+                Clear
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-        {bookings.map((booking, index) => (
+        {filteredBookings.map((booking, index) => (
           <BookingCard
             key={booking._id || index}
             booking={booking}
             onEdit={() => openModal(booking)}
             onDelete={() => openDeleteModal(booking)}
+            isAdmin={isAdmin}
           />
         ))}
       </div>
