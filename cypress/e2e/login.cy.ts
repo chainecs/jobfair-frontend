@@ -1,6 +1,6 @@
 import { frontEndUrl } from "../utils/constant";
 
-describe("Login functionality", () => {
+describe("Login Features", () => {
   beforeEach(() => {
     cy.visit(`${frontEndUrl}/login`);
   });

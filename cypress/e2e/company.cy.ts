@@ -1,19 +1,20 @@
 import { frontEndUrl } from "../utils/constant";
 import { getRandomName, getRandomNumber } from "../utils/generator";
 
-function loginAndRedirect() {
-  cy.visit(`${frontEndUrl}/login`);
-  cy.get('input[id="email"]').type("chainza@gmail.com");
-  cy.get('input[id="password"]').type("123456");
-  cy.get('button[type="submit"]').click();
-  cy.wait(1000);
-  cy.visit(`${frontEndUrl}/company`);
-}
+describe("Company Management Features", () => {
+  beforeEach(() => {
+    cy.session("userSession", () => {
+      cy.visit(`${frontEndUrl}/login`);
+      cy.get('input[id="email"]').type("chainza@gmail.com");
+      cy.get('input[id="password"]').type("123456");
+      cy.get('button[type="submit"]').click();
+      cy.url().should("not.include", "/login");
+    });
+    cy.visit(`${frontEndUrl}/company`);
+  });
 
-describe("Company Management", () => {
   it("should create a new company successfully", () => {
     const companyName = getRandomName();
-    loginAndRedirect();
     cy.contains("Create New Company").click();
     cy.get('input[name="name"]').type(companyName);
     cy.get('input[name="business"]').type("Software Development");
@@ -30,7 +31,6 @@ describe("Company Management", () => {
   });
 
   it("should validate required fields", () => {
-    loginAndRedirect();
     cy.contains("Create New Company").click();
     cy.contains("Save").click();
     cy.contains("Name is required.").should("be.visible");
@@ -42,7 +42,6 @@ describe("Company Management", () => {
   });
 
   it("should update a company successfully", () => {
-    loginAndRedirect();
     cy.contains("Edit").first().click();
     cy.get('input[name="name"]').clear().type(getRandomName());
     cy.contains("Save").click();
@@ -50,7 +49,6 @@ describe("Company Management", () => {
   });
 
   it("should delete a company successfully", () => {
-    loginAndRedirect();
     cy.contains("Delete").first().click();
     cy.get("#confirm-delete-button").click();
     cy.contains("Company deleted successfully.").should("be.visible");
