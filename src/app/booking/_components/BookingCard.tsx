@@ -12,9 +12,6 @@ interface BookingCardProps {
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking, onEdit, onDelete, isAdmin }) => {
   const bookingDate = new Date(booking.bookingDate);
-
-  console.log("booking", booking);
-
   return (
     <div className='bg-white shadow-lg rounded-lg p-6 flex flex-col h-full' style={{ minHeight: "250px" }}>
       <div>

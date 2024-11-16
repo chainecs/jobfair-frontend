@@ -1,9 +1,9 @@
 import { ICompany } from "./ICompany";
 
 export interface IBooking {
-  _id?: string;
+  _id: string;
   bookingDate: Date;
-  user?: string;
+  user: string;
   company: ICompany | null;
-  createdAt?: Date;
+  createdAt: Date;
 }

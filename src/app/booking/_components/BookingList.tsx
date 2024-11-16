@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { MdAdd } from "react-icons/md";
+
 import BookingCard from "./BookingCard";
 import BookingFormModal from "./BookingFormModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
-import { IBooking } from "@/@types/IBooking";
-import { ICompany } from "@/@types/ICompany";
+import MessageModal from "@/components/MessageModal";
+import Loading from "@/app/loading";
+
 import { useBookingStore } from "@/store/bookings/useBookingStore";
 import { fetchCompanies } from "@/services/company";
-import MessageModal from "@/components/MessageModal";
-import { MdAdd } from "react-icons/md";
-import Loading from "@/app/loading";
-import { useSession } from "next-auth/react";
+import { IBooking } from "@/@types/IBooking";
+import { ICompany } from "@/@types/ICompany";
 
 const BookingManagement: React.FC = () => {
   const {
@@ -30,12 +32,18 @@ const BookingManagement: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [formData, setFormData] = useState<IBooking>({ bookingDate: new Date(), company: null });
-  const [companies, setCompanies] = useState<ICompany[]>([]);
-  const [messageModal, setMessageModal] = useState<{ message: string; isVisible: boolean }>({
-    message: "",
-    isVisible: false,
+  const [formData, setFormData] = useState<IBooking>({
+    _id: "", // Initialize with empty string for new bookings
+    bookingDate: new Date(),
+    user: "", // Initialize with empty string
+    company: null,
+    createdAt: new Date(), // Initialize with current date
   });
+  const [companies, setCompanies] = useState<ICompany[]>([]);
+  const [messageModal, setMessageModal] = useState<{
+    message: string;
+    isVisible: boolean;
+  }>({ message: "", isVisible: false });
   const [companyValidationMessage, setCompanyValidationMessage] = useState<string>("");
   const [dateValidationMessage, setDateValidationMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -47,14 +55,13 @@ const BookingManagement: React.FC = () => {
     const getBookings = async () => {
       try {
         const bookingsData = await listBookings();
-        console.log("bookingsData", bookingsData);
         setBookings(bookingsData);
-        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    getBookings();
 
     const getCompanies = async () => {
       try {
@@ -64,16 +71,30 @@ const BookingManagement: React.FC = () => {
         console.error("Failed to fetch companies:", error);
       }
     };
+
+    getBookings();
     getCompanies();
   }, [listBookings, setBookings]);
 
   const openModal = (booking?: IBooking) => {
     if (booking) {
       setSelectedBooking(booking);
-      setFormData({ bookingDate: new Date(booking.bookingDate), company: booking.company });
+      setFormData({
+        _id: booking._id,
+        bookingDate: new Date(booking.bookingDate),
+        user: booking.user,
+        company: booking.company,
+        createdAt: new Date(booking.createdAt),
+      });
     } else {
       setSelectedBooking(null);
-      setFormData({ bookingDate: new Date(), company: null });
+      setFormData({
+        _id: "",
+        bookingDate: new Date(),
+        user: "",
+        company: null,
+        createdAt: new Date(),
+      });
     }
     setIsModalOpen(true);
   };
@@ -116,7 +137,7 @@ const BookingManagement: React.FC = () => {
         setDateValidationMessage("Booking date must be in the future.");
       } else {
         setDateValidationMessage("");
-        setFormData({ ...formData, bookingDate: date });
+        setFormData((prev) => ({ ...prev, bookingDate: date }));
       }
     }
   };
@@ -133,19 +154,20 @@ const BookingManagement: React.FC = () => {
 
     setIsSaving(true);
     try {
-      if (selectedBooking) {
-        await updateBooking(selectedBooking._id!, formData);
-        await listBookings();
+      if (formData._id !== "") {
+        // Existing booking
+        await updateBooking(formData._id, formData);
         showMessageModal("Booking updated successfully.");
       } else {
+        // New booking
         if (bookings.length >= 3) {
           showMessageModal("You can only book up to 3 times.");
           return;
         }
         await createBooking(formData.company._id, formData);
-        await listBookings();
         showMessageModal("Booking created successfully.");
       }
+      await listBookings();
       setCompanyValidationMessage("");
       closeModal();
     } catch (error) {
@@ -159,12 +181,15 @@ const BookingManagement: React.FC = () => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      if (selectedBooking) {
-        await deleteBooking(selectedBooking._id!);
-        await listBookings();
-        showMessageModal("Booking deleted successfully.");
-        closeDeleteModal();
+      if (!selectedBooking) {
+        showMessageModal("No booking selected.");
+        return;
       }
+
+      await deleteBooking(selectedBooking._id);
+      await listBookings();
+      showMessageModal("Booking deleted successfully.");
+      closeDeleteModal();
     } catch (error) {
       console.error("Failed to delete booking:", error);
       showMessageModal("Failed to delete booking.");
@@ -191,7 +216,7 @@ const BookingManagement: React.FC = () => {
               <MdAdd className='mr-2 text-lg' /> Create New Booking
             </button>
           ) : (
-            <div className='flex flex-row items-center align-center'>
+            <div className='flex flex-row items-center'>
               <input
                 type='text'
                 value={filterUserId}
@@ -209,9 +234,9 @@ const BookingManagement: React.FC = () => {
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-        {filteredBookings.map((booking, index) => (
+        {filteredBookings.map((booking) => (
           <BookingCard
-            key={booking._id || index}
+            key={booking._id}
             booking={booking}
             onEdit={() => openModal(booking)}
             onDelete={() => openDeleteModal(booking)}
@@ -227,7 +252,7 @@ const BookingManagement: React.FC = () => {
           onDateChange={handleDateChange}
           onSave={handleSave}
           onClose={closeModal}
-          isEdit={!!selectedBooking}
+          isEdit={formData._id !== ""}
           companies={companies}
           companyValidationMessage={companyValidationMessage}
           dateValidationMessage={dateValidationMessage}
@@ -235,7 +260,7 @@ const BookingManagement: React.FC = () => {
         />
       )}
 
-      {isDeleteModalOpen && (
+      {isDeleteModalOpen && selectedBooking && (
         <DeleteConfirmationModal
           onConfirm={handleDelete}
           onClose={closeDeleteModal}
@@ -243,6 +268,7 @@ const BookingManagement: React.FC = () => {
           booking={selectedBooking}
         />
       )}
+
       {messageModal.isVisible && <MessageModal message={messageModal.message} onClose={closeMessageModal} />}
     </div>
   );
