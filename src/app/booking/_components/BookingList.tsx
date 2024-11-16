@@ -1,3 +1,5 @@
+// BookingManagement.tsx
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -33,11 +35,11 @@ const BookingManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [formData, setFormData] = useState<IBooking>({
-    _id: "", // Initialize with empty string for new bookings
+    _id: "",
     bookingDate: new Date(),
-    user: "", // Initialize with empty string
+    user: "",
     company: null,
-    createdAt: new Date(), // Initialize with current date
+    createdAt: new Date(),
   });
   const [companies, setCompanies] = useState<ICompany[]>([]);
   const [messageModal, setMessageModal] = useState<{
@@ -133,7 +135,10 @@ const BookingManagement: React.FC = () => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      if (date <= today) {
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      if (selectedDate <= today) {
         setDateValidationMessage("Booking date must be in the future.");
       } else {
         setDateValidationMessage("");
@@ -234,9 +239,9 @@ const BookingManagement: React.FC = () => {
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-        {filteredBookings.map((booking) => (
+        {filteredBookings.map((booking, index) => (
           <BookingCard
-            key={booking._id}
+            key={index}
             booking={booking}
             onEdit={() => openModal(booking)}
             onDelete={() => openDeleteModal(booking)}

@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import { IBooking } from "@/@types/IBooking";
 import { ICompany } from "@/@types/ICompany";
+import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface BookingFormModalProps {
-  formData: { bookingDate: Date; company: ICompany | null };
+  formData: IBooking;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onDateChange: (date: Date | null) => void;
   onSave: () => void;
